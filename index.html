@@ -1,0 +1,350 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#17151f">
+<title>Free Nitro Hub</title>
+<style>
+:root {
+  --bg:#1e1f22; --side:#18191c; --panel:#232428; --panel2:#2b2d31;
+  --hover:#35373c; --text:#f2f3f5; --muted:#949ba4; --line:#35373c;
+  --purple:#8b5cf6; --purple2:#6d45d6; --green:#23a559;
+  --bubble:#292a2f; --radius:12px;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:15px/1.45 system-ui,-apple-system,Segoe UI,sans-serif}
+button,input,textarea,select{font:inherit}
+button{cursor:pointer;color:inherit;border:0}
+button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:2px solid var(--purple);outline-offset:2px}
+button:disabled{opacity:.4;cursor:not-allowed}
+.app{height:100dvh;display:flex;overflow:hidden}
+.servers{width:68px;flex-shrink:0;background:var(--side);display:flex;align-items:center;gap:10px;flex-direction:column;padding:12px 8px;overflow:auto}
+.server{width:48px;height:48px;min-height:48px;border-radius:17px;background:var(--panel2);display:grid;place-items:center;font-size:23px;position:relative;transition:.18s}
+.server:hover,.server.active{border-radius:14px;background:var(--purple)}
+.server.active:before{content:"";position:absolute;left:-8px;width:4px;height:30px;border-radius:4px;background:white}
+.server.add{color:#48d18b;font-size:27px}
+.left{width:238px;min-width:190px;background:var(--side);display:flex;flex-direction:column;flex-shrink:0}
+.brand{height:62px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;border-bottom:1px solid var(--line);font-weight:800;font-size:17px}
+.brandmark{background:var(--purple);border-radius:10px;padding:5px 7px;margin-right:8px}
+.brandname{display:flex;align-items:center}
+.iconbtn{background:transparent;border-radius:8px;padding:8px;font-size:17px}
+.iconbtn:hover{background:var(--hover)}
+.serverhead{padding:17px 14px 10px;font-size:12px;text-transform:uppercase;color:var(--muted);font-weight:750;letter-spacing:.7px}
+.channels{overflow-y:auto;flex:1;padding:0 9px}
+.channel{display:flex;align-items:center;gap:9px;width:100%;text-align:left;padding:9px 10px;border-radius:7px;background:transparent;color:var(--muted);margin-bottom:2px}
+.channel:hover,.channel.active{background:var(--hover);color:var(--text)}
+.channel .hash{font-size:20px;color:#737983}
+.channel.active .hash{color:var(--text)}
+.channel .count{margin-left:auto;background:var(--purple);border-radius:20px;padding:1px 6px;font-size:11px;color:white}
+.userbar{padding:10px;background:#202125;display:flex;align-items:center;gap:9px}
+.avatar{width:37px;height:37px;border-radius:50%;background:#45405b;display:grid;place-items:center;font-size:21px;flex-shrink:0;position:relative;border:2px solid transparent}
+.avatar.online:after{content:"";position:absolute;width:10px;height:10px;right:-1px;bottom:-1px;border-radius:50%;background:#35c46a;border:3px solid var(--side)}
+.avatar.idle:after{content:"";position:absolute;width:10px;height:10px;right:-1px;bottom:-1px;border-radius:50%;background:#f0b232;border:3px solid var(--side)}
+.avatar.dnd:after{content:"";position:absolute;width:10px;height:10px;right:-1px;bottom:-1px;border-radius:50%;background:#ed4245;border:3px solid var(--side)}
+.userinfo{min-width:0;flex:1}
+.userinfo strong,.userinfo small{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.userinfo small{color:var(--muted);font-size:11px}
+.main{display:flex;flex:1;min-width:0;flex-direction:column}
+.topbar{height:62px;min-height:62px;padding:0 17px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px}
+.top-title{font-weight:750;display:flex;align-items:center;gap:9px;min-width:0;flex:1}
+.top-title small{font-weight:400;color:var(--muted)}
+.top-actions{display:flex;gap:4px}
+.chatlayout{display:flex;flex:1;min-height:0}
+.chat{flex:1;min-width:0;display:flex;flex-direction:column}
+.welcome{padding:24px 20px 12px}
+.welcome-icon{font-size:33px}
+.welcome h2{font-size:24px;margin:7px 0}
+.welcome p{color:var(--muted);margin:0;font-size:13px}
+.messages{flex:1;overflow-y:auto;padding:10px 18px 18px;scroll-behavior:smooth}
+.day{text-align:center;color:var(--muted);font-size:11px;display:flex;align-items:center;gap:12px;margin:13px 0}
+.day:before,.day:after{content:"";height:1px;background:var(--line);flex:1}
+.message{display:flex;gap:11px;padding:9px 5px;border-radius:7px;margin:1px 0}
+.message:hover{background:var(--bubble)}
+.msgavatar{width:39px;height:39px;border-radius:50%;display:grid;place-items:center;flex-shrink:0;font-size:22px;background:#403b54}
+.msgbody{min-width:0;flex:1}
+.msghead{display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}
+.msghead strong{font-size:14px}
+.time{font-size:10px;color:var(--muted)}
+.msgtext{white-space:pre-wrap;overflow-wrap:anywhere;margin-top:3px}
+.reactions{display:flex;flex-wrap:wrap;gap:5px;margin-top:7px}
+.react{background:var(--panel2);border:1px solid transparent;border-radius:9px;padding:3px 8px;font-size:13px}
+.react:hover,.react.selected{border-color:var(--purple);background:#40345e}
+.msgtools{display:flex;gap:4px;margin-top:6px}
+.msgtools button{background:var(--panel2);border-radius:7px;padding:3px 7px;color:var(--muted);font-size:12px}
+.composerwrap{padding:8px 16px 17px}
+.composer{display:flex;gap:6px;align-items:flex-end;background:var(--panel2);padding:9px;border-radius:12px}
+.composer textarea{flex:1;min-width:0;resize:none;max-height:120px;border:0;background:transparent;color:var(--text);outline:none;padding:6px}
+.composer button{background:transparent;border-radius:8px;padding:7px;font-size:19px}
+.composer button:hover{background:var(--hover)}
+.send{background:var(--purple)!important;font-size:15px!important;padding:9px 13px!important}
+.hint{font-size:10px;color:var(--muted);padding:6px 3px 0}
+.members{width:205px;background:var(--side);padding:16px 11px;overflow-y:auto;flex-shrink:0}
+.membertitle{font-size:11px;color:var(--muted);font-weight:750;text-transform:uppercase;margin:7px 8px 10px}
+.member{display:flex;align-items:center;gap:8px;padding:7px;border-radius:7px;cursor:pointer}
+.member:hover{background:var(--hover)}
+.member .avatar{width:32px;height:32px;font-size:17px}
+.membername{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px}
+.view{flex:1;overflow-y:auto;padding:25px;min-width:0}
+.view h1{font-size:25px;margin:0 0 8px}
+.view h2{font-size:17px;margin:22px 0 10px}
+.muted{color:var(--muted)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:17px;margin:12px 0}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px}
+.btn{background:var(--purple);padding:10px 14px;border-radius:9px;font-weight:700;transition:.15s}
+.btn:hover{background:var(--purple2);transform:translateY(-1px)}
+.btn.secondary{background:var(--panel2);border:1px solid var(--line)}
+.btn.danger{background:#9e353a}
+.btn.small{padding:6px 10px;font-size:12px}
+.input{width:100%;background:var(--side);color:var(--text);border:1px solid var(--line);border-radius:8px;padding:11px;margin:5px 0 12px}
+label{font-size:12px;color:var(--muted);font-weight:650}
+.hero{background:linear-gradient(135deg,#5631a4,#25213b 65%,#202125);border-radius:18px;padding:25px;position:relative;overflow:hidden}
+.hero h1{font-size:31px}
+.hero .sparkle{font-size:45px}
+.tag{display:inline-block;background:#6f4bc4;padding:4px 9px;border-radius:20px;font-size:11px;font-weight:800}
+.feature{background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:15px}
+.feature .emoji{font-size:27px}
+.feature h3{font-size:15px;margin:8px 0 4px}
+.feature p{font-size:12px;color:var(--muted);margin:0}
+.profilehero{background:linear-gradient(120deg,#6843c2,#30294b);height:100px;border-radius:12px 12px 0 0}
+.profiletop{margin-top:-31px;padding:0 15px 12px}
+.bigavatar{width:76px;height:76px;border:6px solid var(--panel);font-size:37px}
+.badges{display:flex;gap:5px;flex-wrap:wrap;margin:8px 0}
+.badge{background:#3b3056;border:1px solid #62489b;padding:4px 8px;border-radius:7px;font-size:11px}
+.statusdot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#35c46a;margin-right:5px}
+.emoji-pop{position:absolute;bottom:100%;left:0;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:9px;display:grid;grid-template-columns:repeat(6,35px);gap:4px;z-index:20;box-shadow:0 8px 30px #0008}
+.emoji-pop button{background:var(--panel2);padding:6px;border-radius:6px;font-size:20px}
+.composer{position:relative}
+.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:#111318;border:1px solid var(--line);border-radius:10px;padding:11px 17px;z-index:100;box-shadow:0 6px 30px #0008;max-width:90%;text-align:center}
+.mobilebar{display:none}
+.empty{text-align:center;padding:35px 10px;color:var(--muted)}
+a{color:#bba5ff}
+.theme-light{--bg:#f3f4f8;--side:#e6e7ed;--panel:#fff;--panel2:#e8e9f0;--hover:#dadce5;--text:#22232a;--muted:#686d78;--line:#d5d7df;--bubble:#f0f0f6}
+.theme-midnight{--bg:#10111b;--side:#0b0c14;--panel:#171827;--panel2:#202136;--hover:#292a43;--line:#2c2d45;--bubble:#1a1b2b}
+@media(max-width:850px){.members{display:none}.left{width:205px}.view{padding:18px}}
+@media(max-width:580px){
+ .app{height:100dvh;padding-bottom:58px}
+ .servers{display:none}
+ .left{display:none}
+ .main{width:100%}
+ .topbar{height:54px;min-height:54px;padding:0 10px}
+ .top-title{font-size:14px}
+ .top-actions .desktop-only{display:none}
+ .welcome{padding:18px 14px 8px}
+ .welcome h2{font-size:21px}
+ .messages{padding:8px 8px 15px}
+ .composerwrap{padding:7px 8px 10px}
+ .composer{padding:6px;gap:2px}
+ .composer textarea{font-size:14px}
+ .view{padding:16px 12px}
+ .hero{padding:19px}
+ .hero h1{font-size:26px}
+ .mobilebar{display:flex;position:fixed;z-index:50;bottom:0;left:0;right:0;height:61px;padding:5px 4px calc(5px + env(safe-area-inset-bottom));background:var(--side);border-top:1px solid var(--line);justify-content:space-around}
+ .mobilebar button{flex:1;background:transparent;border-radius:8px;color:var(--muted);font-size:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px}
+ .mobilebar button span{font-size:20px}
+ .mobilebar button.active{color:#c7b5ff}
+ .mobile-server-select{display:block!important}
+ .profilehero{height:82px}
+}
+.mobile-server-select{display:none}
+</style>
+</head>
+<body>
+<div id="app" class="app"></div>
+<div id="toast" hidden class="toast"></div>
+<script>
+(() => {
+"use strict";
+const $ = id => document.getElementById(id);
+const KEY = "freeNitroHubDemo_v1";
+const defaults = {
+ user:{name:"GuestPlayer",avatar:"😎",status:"online",bio:"Welcome to my profile!",theme:"purple",decor:true,badges:true},
+ page:"chat",server:0,channel:0,dm:null,
+ servers:[
+  {name:"Free Nitro Hub",icon:"💜",channels:[
+   {name:"welcome",topic:"Say hello and meet the community"},
+   {name:"general",topic:"Chat about anything"},
+   {name:"memes",topic:"Share your favorite memes"},
+   {name:"nitro-showcase",topic:"Show off your cosmetic demo perks"}
+  ]},
+  {name:"Gaming Lounge",icon:"🎮",channels:[
+   {name:"general",topic:"Gaming conversations"},
+   {name:"looking-for-group",topic:"Find people to play with"}
+  ]},
+  {name:"Creative Corner",icon:"🎨",channels:[
+   {name:"art",topic:"Share your creations"},
+   {name:"ideas",topic:"Suggest new ideas"}
+  ]}
+ ],
+ messages:{},
+ friends:[
+  {name:"Luna",avatar:"🌙",status:"online"},
+  {name:"PixelFox",avatar:"🦊",status:"idle"},
+  {name:"Nova",avatar:"⭐",status:"online"},
+  {name:"Cloudy",avatar:"☁️",status:"dnd"}
+ ],
+ reactions:{},decorations:true
+};
+let data;
+try {
+ const saved=JSON.parse(localStorage.getItem(KEY)||"null");
+ data=saved && saved.user && saved.servers ? {...defaults,...saved,user:{...defaults.user,...saved.user}} : structuredClone(defaults);
+} catch(e){data=JSON.parse(JSON.stringify(defaults))}
+let emojiOpen=false, loginMode="login", toastTimer, messageSearch="";
+const emojis=["😀","😂","🥹","😍","😎","😭","🔥","❤️","💜","👍","👎","🎉","✨","💀","👀","🤔","🚀","⭐","🌙","☁️","🎮","💎","👑","🥳","🤣","🙌","💯","🫡","🍀","🌈","🦊","🐱"];
+function save(){try{localStorage.setItem(KEY,JSON.stringify(data))}catch(e){notify("Storage is full; some changes may not save.")}}
+function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+function notify(s){const t=$("toast");t.textContent=s;t.hidden=false;clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.hidden=true,2400)}
+function currentServer(){return data.servers[data.server]||data.servers[0]}
+function currentChannel(){return currentServer().channels[data.channel]||currentServer().channels[0]}
+function key(){return data.server+"_"+data.channel}
+function msgs(){if(!data.messages[key()])data.messages[key()]=[];return data.messages[key()]}
+function activePage(p){data.page=p;emojiOpen=false;render();save()}
+function ava(emoji,status="online",cls=""){return `<div class="avatar ${esc(status)} ${cls}">${esc(emoji||"🙂")}</div>`}
+function btn(label,action,cls="btn",title=""){return `<button class="${cls}" data-action="${action}" title="${esc(title||label)}">${label}</button>`}
+function pageTitle(){return ({chat:currentChannel().name,home:"Home",friends:"Friends",nitro:"Free Demo Nitro",profile:"My Profile",settings:"User Settings",login:"Demo Account"})[data.page]||"Free Nitro Hub"}
+function render(){
+ document.body.className="theme-"+(data.user.theme==="light"?"light":data.user.theme==="midnight"?"midnight":"");
+ const app=$("app");
+ app.innerHTML=`
+ <aside class="servers">
+  <button class="server ${data.page==="home"?"active":""}" data-action="home" title="Home">⌂</button>
+  <div style="height:1px;background:var(--line);width:30px;margin:2px 0"></div>
+  ${data.servers.map((s,i)=>`<button class="server ${data.page==="chat"&&data.server===i?"active":""}" data-action="server" data-i="${i}" title="${esc(s.name)}">${esc(s.icon)}</button>`).join("")}
+  <button class="server add" data-action="addserver" title="Create demo server">+</button>
+ </aside>
+ <aside class="left">
+  <div class="brand"><span class="brandname"><span class="brandmark">✦</span>Free Nitro Hub</span><button class="iconbtn" data-action="addserver" title="Create server">＋</button></div>
+  <div class="serverhead">${esc(currentServer().name)} <button class="iconbtn" data-action="addchannel" style="float:right;padding:0 5px">＋</button></div>
+  <div class="channels">
+   <button class="channel ${data.page==="home"?"active":""}" data-action="home"><span>⌂</span> Home</button>
+   <button class="channel ${data.page==="friends"?"active":""}" data-action="friends"><span>♧</span> Friends</button>
+   <div class="serverhead">TEXT CHANNELS</div>
+   ${currentServer().channels.map((c,i)=>`<button class="channel ${data.page==="chat"&&data.channel===i?"active":""}" data-action="channel" data-i="${i}"><span class="hash">#</span><span>${esc(c.name)}</span>${c.name==="welcome"?'<span class="count">NEW</span>':""}</button>`).join("")}
+   <div class="serverhead">PERSONAL</div>
+   <button class="channel ${data.page==="nitro"?"active":""}" data-action="nitro"><span>💎</span> Free Demo Nitro</button>
+   <button class="channel ${data.page==="profile"?"active":""}" data-action="profile"><span>👤</span> My Profile</button>
+   <button class="channel ${data.page==="settings"?"active":""}" data-action="settings"><span>⚙</span> Settings</button>
+  </div>
+  <div class="userbar">${ava(data.user.avatar,data.user.status)}<div class="userinfo"><strong>${esc(data.user.name)}</strong><small>${esc(data.user.status)} · Demo</small></div><button class="iconbtn" data-action="settings" title="Settings">⚙</button></div>
+ </aside>
+ <main class="main">
+  <header class="topbar">
+   <div class="top-title"><span>${data.page==="chat"?"#":data.page==="nitro"?"💎":"✦"}</span><span>${esc(pageTitle())}<small style="display:block;font-size:10px">${data.page==="chat"?esc(currentChannel().topic):"Free, local browser demo"}</small></span></div>
+   <div class="top-actions">
+    <button class="iconbtn desktop-only" data-action="friends" title="Friends">♧</button>
+    <button class="iconbtn" data-action="search" title="Search messages">⌕</button>
+    <button class="iconbtn" data-action="profile" title="Profile">👤</button>
+   </div>
+  </header>
+  ${data.page==="chat"?chatPage():data.page==="home"?homePage():data.page==="friends"?friendsPage():data.page==="nitro"?nitroPage():data.page==="profile"?profilePage():data.page==="settings"?settingsPage():loginPage()}
+ </main>
+ <nav class="mobilebar">
+  <button data-action="home" class="${data.page==="home"?"active":""}"><span>⌂</span>Home</button>
+  <button data-action="chat" class="${data.page==="chat"?"active":""}"><span>#</span>Chat</button>
+  <button data-action="friends" class="${data.page==="friends"?"active":""}"><span>♧</span>Friends</button>
+  <button data-action="nitro" class="${data.page==="nitro"?"active":""}"><span>💎</span>Nitro</button>
+  <button data-action="settings" class="${data.page==="settings"?"active":""}"><span>⚙</span>Settings</button>
+ </nav>`;
+ bind();
+}
+function chatPage(){
+ const list=msgs().filter(m=>!messageSearch||m.text.toLowerCase().includes(messageSearch.toLowerCase()));
+ return `<div class="chatlayout"><section class="chat">
+ <div class="welcome"><div class="welcome-icon">#</div><h2>Welcome to #${esc(currentChannel().name)}!</h2><p>${esc(currentChannel().topic)}. This is the beginning of this channel.</p></div>
+ <div class="messages" id="messages">${list.length?`<div class="day">MESSAGES · LOCAL DEMO</div>${list.map((m,i)=>messageHTML(m,i)).join("")}`:`<div class="empty">💬<br><strong>No messages${messageSearch?" match your search": " yet"}</strong><p>Be the first to say hello!</p></div>`}</div>
+ <div class="composerwrap"><div class="composer">
+ <button data-action="emoji" title="Emoji picker">＋</button>
+ ${emojiOpen?`<div class="emoji-pop">${emojis.map(e=>`<button data-action="insertEmoji" data-emoji="${e}">${e}</button>`).join("")}</div>`:""}
+ <textarea id="messageInput" rows="1" maxlength="1500" placeholder="Message #${esc(currentChannel().name)}" aria-label="Message">${""}</textarea>
+ <button data-action="insertQuick" data-emoji="🎁" title="Add a gift emoji">🎁</button>
+ <button class="send" data-action="send">Send</button>
+ </div><div class="hint">Enter to send · Shift + Enter for a new line · Messages stay in this browser</div></div>
+ </section><aside class="members"><div class="membertitle">Members — ${data.friends.length+1}</div>
+ <div class="member" data-action="profile">${ava(data.user.avatar,data.user.status)}<div class="membername">${esc(data.user.name)} <small style="color:var(--muted)"> (you)</small></div></div>
+ <div class="membertitle">ONLINE — ${data.friends.filter(f=>f.status==="online").length}</div>
+ ${data.friends.map((f,i)=>`<div class="member" data-action="friend" data-i="${i}">${ava(f.avatar,f.status)}<div class="membername">${esc(f.name)}</div></div>`).join("")}
+ </aside></div>`;
+}
+function messageHTML(m,i){
+ const reactions=(m.reactions||[]).map((r,j)=>`<button class="react ${r.mine?"selected":""}" data-action="react" data-mi="${i}" data-ri="${j}">${esc(r.emoji)} ${r.count}</button>`).join("");
+ return `<article class="message">${ava(m.avatar,m.status,"msgavatar")}<div class="msgbody"><div class="msghead"><strong>${esc(m.name)}</strong>${m.demo?'<span class="badge">DEMO BOT</span>':""}<span class="time">${esc(m.time)}</span></div><div class="msgtext">${esc(m.text)}</div>${reactions?`<div class="reactions">${reactions}</div>`:""}<div class="msgtools"><button data-action="addreact" data-mi="${i}">☺ React</button>${m.mine?`<button data-action="delete" data-mi="${i}">Delete</button>`:""}</div></div></article>`;
+}
+function homePage(){return `<div class="view"><div class="hero"><span class="tag">UNOFFICIAL BROWSER DEMO</span><div class="sparkle">✦ 💜</div><h1>Welcome to Free Nitro Hub</h1><p>A community-style chat playground with customizable profiles and cosmetic demo perks.</p><br>${btn("Open chat","chat")} ${btn("Explore Demo Nitro","nitro","btn secondary")}</div><h2>Your servers</h2><div class="grid">${data.servers.map((s,i)=>`<div class="card"><div style="font-size:32px">${esc(s.icon)}</div><h3>${esc(s.name)}</h3><p class="muted">${s.channels.length} channels · Local demo</p>${btn("Open server","server","btn small")}<input type="hidden" value="${i}"></div>`).join("")}</div><h2>Quick actions</h2><div class="grid"><div class="card"><h3>👤 Customize your profile</h3><p class="muted">Choose an avatar, status and bio.</p>${btn("Edit profile","profile","btn secondary")}</div><div class="card"><h3>💎 Demo Nitro</h3><p class="muted">Try cosmetic themes and badges.</p>${btn("Explore perks","nitro","btn secondary")}</div><div class="card"><h3>♧ Friends</h3><p class="muted">View your sample friends.</p>${btn("View friends","friends","btn secondary")}</div></div><p class="muted">Messages and profile settings are stored locally. Other visitors cannot see your data.</p></div>`}
+function friendsPage(){return `<div class="view"><h1>Friends</h1><p class="muted">Sample friends for your local demo.</p><div class="card"><strong>All friends — ${data.friends.length}</strong></div>${data.friends.map((f,i)=>`<div class="card" style="display:flex;align-items:center;gap:12px">${ava(f.avatar,f.status)}<div style="flex:1"><strong>${esc(f.name)}</strong><div class="muted">${esc(f.status)}</div></div>${btn("Message","friend","btn secondary small")} ${btn("Change status","friendstatus","btn small")}</div>`).join("")}<div class="card"><h3>Add a sample friend</h3><label>Display name</label><input class="input" id="friendName" maxlength="24" placeholder="Enter a demo name">${btn("Add friend","addfriend")}</div></div>`}
+function nitroPage(){return `<div class="view"><div class="hero"><span class="tag">FREE DEMO NITRO</span><h1>💎 Make your profile shine</h1><p>Try local cosmetic effects without payment. No real Nitro is included.</p><br>${btn(data.decorations?"Disable decorations":"Enable decorations","toggleDecor")}</div><h2>Demo perks</h2><div class="grid">
+ <div class="feature"><div class="emoji">✨</div><h3>Profile sparkle</h3><p>A cosmetic profile decoration inside this demo.</p></div>
+ <div class="feature"><div class="emoji">🎨</div><h3>Custom themes</h3><p>Choose purple, midnight or light appearance.</p></div>
+ <div class="feature"><div class="emoji">🏅</div><h3>Demo badges</h3><p>Decorative badges for your local profile only.</p></div>
+ <div class="feature"><div class="emoji">😎</div><h3>Custom avatar</h3><p>Use an emoji as your demo avatar.</p></div>
+ <div class="feature"><div class="emoji">💬</div><h3>Local chat</h3><p>Send messages and add reactions in your browser.</p></div>
+ <div class="feature"><div class="emoji">💜</div><h3>No payment</h3><p>No checkout, payment details or real subscription.</p></div></div>
+ <div class="card"><h2>Important</h2><p class="muted">These perks are visual features created for Free Nitro Hub. They do not unlock Discord features, change a Discord account, or grant an actual Nitro subscription.</p>${btn("Customize my profile","profile")}</div></div>`}
+function profilePage(){return `<div class="view"><h1>My Profile</h1><p class="muted">Customize your local demo identity.</p><div class="card" style="padding:0;overflow:hidden;max-width:620px"><div class="profilehero"></div><div class="profiletop">${ava(data.user.avatar,data.user.status,"bigavatar")}<h2 style="margin:6px 0 0">${esc(data.user.name)} ${data.decorations&&data.user.decor?"✨":""}</h2><div class="muted">${esc(data.user.status)} · Free Nitro Hub</div>${data.user.badges?'<div class="badges"><span class="badge">✦ DEMO MEMBER</span><span class="badge">💎 COSMETIC PERKS</span></div>':""}<p>${esc(data.user.bio)}</p></div></div>
+ <div class="card" style="max-width:620px"><h2>Edit profile</h2><label>Display name</label><input id="profileName" class="input" maxlength="24" value="${esc(data.user.name)}"><label>Avatar emoji</label><input id="profileAvatar" class="input" maxlength="8" value="${esc(data.user.avatar)}"><label>About me</label><textarea id="profileBio" class="input" maxlength="180" rows="3">${esc(data.user.bio)}</textarea><label>Status</label><select id="profileStatus" class="input"><option value="online" ${data.user.status==="online"?"selected":""}>🟢 Online</option><option value="idle" ${data.user.status==="idle"?"selected":""}>🌙 Idle</option><option value="dnd" ${data.user.status==="dnd"?"selected":""}>⛔ Do not disturb</option><option value="offline" ${data.user.status==="offline"?"selected":""}>⚫ Invisible</option></select><label><input id="profileBadges" type="checkbox" ${data.user.badges?"checked":""}> Show demo badges</label><br><br>${btn("Save profile","saveprofile")} ${btn("Reset profile","resetprofile","btn secondary")}</div></div>`}
+function settingsPage(){return `<div class="view"><h1>User Settings</h1><p class="muted">Settings apply only to this browser demo.</p><div class="card"><h2>Appearance</h2><label>Theme</label><select id="themeSelect" class="input"><option value="purple" ${data.user.theme==="purple"?"selected":""}>Purple Dark</option><option value="midnight" ${data.user.theme==="midnight"?"selected":""}>Midnight</option><option value="light" ${data.user.theme==="light"?"selected":""}>Light</option></select>${btn("Apply theme","savetheme")}<hr style="border-color:var(--line);margin:20px 0"><label><input id="decorSetting" type="checkbox" ${data.user.decor?"checked":""}> Enable profile sparkle decoration</label><br><br><label><input id="badgeSetting" type="checkbox" ${data.user.badges?"checked":""}> Show cosmetic demo badges</label></div><div class="card"><h2>Demo data</h2><p class="muted">Clear messages, custom profiles and local changes to restore the original sample data.</p>${btn("Export demo data","export","btn secondary")} ${btn("Reset all demo data","resetall","btn danger")}</div><div class="card"><h2>Account safety</h2><p class="muted">This demo does not use Discord login, collect passwords, or authenticate with Discord. Do not enter real account credentials.</p>${btn("Demo login / signup","login","btn secondary")}</div></div>`}
+function loginPage(){return `<div class="view"><div class="card" style="max-width:460px;margin:25px auto"><div style="text-align:center;font-size:40px">✦</div><h1 style="text-align:center">${loginMode==="login"?"Welcome back":"Create a demo profile"}</h1><p class="muted" style="text-align:center">Local demo account only. No password required.</p><label>Display name</label><input id="loginName" class="input" maxlength="24" value="${esc(data.user.name)}" placeholder="Choose a display name"><label>Avatar emoji</label><input id="loginAvatar" class="input" maxlength="8" value="${esc(data.user.avatar)}" placeholder="😎"><p class="muted">Your demo profile is saved only in this browser. This is not Discord authentication.</p>${btn(loginMode==="login"?"Continue as demo user":"Create demo profile","demologin")} <button class="btn secondary" data-action="switchlogin">${loginMode==="login"?"Switch to signup":"Back to login"}</button></div></div>`}
+function bind(){
+ document.querySelectorAll("[data-action]").forEach(el=>el.addEventListener("click",()=>act(el.dataset.action,el)));
+ const input=$("messageInput");
+ if(input){input.addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();sendMessage()}});input.addEventListener("input",()=>{input.style.height="auto";input.style.height=Math.min(input.scrollHeight,120)+"px"})}
+}
+function act(a,el){
+ const i=Number(el.dataset.i);
+ switch(a){
+ case "home":activePage("home");break;
+ case "chat":activePage("chat");break;
+ case "server":data.server=i===undefined?0:i;data.channel=0;data.page="chat";messageSearch="";save();render();break;
+ case "channel":data.channel=i;data.page="chat";messageSearch="";save();render();break;
+ case "friends":activePage("friends");break;
+ case "nitro":activePage("nitro");break;
+ case "profile":activePage("profile");break;
+ case "settings":activePage("settings");break;
+ case "login":loginMode="login";activePage("login");break;
+ case "switchlogin":loginMode=loginMode==="login"?"signup":"login";render();break;
+ case "demologin":{const n=$("loginName").value.trim();if(!n)return notify("Enter a display name.");data.user.name=n.slice(0,24);data.user.avatar=$("loginAvatar").value.trim()||"😎";save();activePage("home");notify("Demo profile ready!");break}
+ case "addserver":{const n=prompt("Name your demo server:");if(!n||!n.trim())return;data.servers.push({name:n.trim().slice(0,35),icon:"🌟",channels:[{name:"general",topic:"Welcome to your new demo channel"},{name:"random",topic:"Chat about anything"}]});data.server=data.servers.length-1;data.channel=0;data.page="chat";save();render();notify("Demo server created.");break}
+ case "addchannel":{const n=prompt("New channel name (no spaces):");if(!n||!n.trim())return;currentServer().channels.push({name:n.trim().toLowerCase().replace(/\s+/g,"-").slice(0,32),topic:"A new local demo channel"});data.channel=currentServer().channels.length-1;data.page="chat";save();render();break}
+ case "send":sendMessage();break;
+ case "emoji":emojiOpen=!emojiOpen;render();break;
+ case "insertEmoji":insertText(el.dataset.emoji);break;
+ case "insertQuick":insertText(el.dataset.emoji);break;
+ case "addreact":{const idx=Number(el.dataset.mi);const m=msgs()[idx];if(!m)return;const em=prompt("Enter a reaction emoji (e.g. 💜):","💜");if(!em)return;m.reactions=m.reactions||[];const found=m.reactions.find(r=>r.emoji===em);if(found){found.count++;found.mine=true}else m.reactions.push({emoji:em,count:1,mine:true});save();render();break}
+ case "react":{const m=msgs()[Number(el.dataset.mi)];if(!m)return;const r=m.reactions[Number(el.dataset.ri)];if(!r)return;if(r.mine){r.count--;r.mine=false}else{r.count++;r.mine=true}m.reactions=m.reactions.filter(x=>x.count>0);save();render();break}
+ case "delete":{const idx=Number(el.dataset.mi);const m=msgs()[idx];if(m&&m.mine){msgs().splice(idx,1);save();render();notify("Message deleted.")}break}
+ case "search":{const q=prompt("Search messages in this channel. Leave blank to show all: ",messageSearch);if(q===null)return;messageSearch=q.trim();render();break}
+ case "toggleDecor":data.decorations=!data.decorations;save();render();notify("Cosmetic effect updated.");break;
+ case "saveprofile":{const n=$("profileName").value.trim();if(!n)return notify("Display name cannot be empty.");data.user.name=n.slice(0,24);data.user.avatar=$("profileAvatar").value.trim()||"🙂";data.user.bio=$("profileBio").value.trim().slice(0,180);data.user.status=$("profileStatus").value;data.user.badges=$("profileBadges").checked;save();render();notify("Profile saved locally.");break}
+ case "resetprofile":if(confirm("Reset your profile to the default demo profile?")){data.user={...defaults.user};save();render();notify("Profile reset.")}break;
+ case "savetheme":data.user.theme=$("themeSelect").value;data.user.decor=$("decorSetting").checked;data.user.badges=$("badgeSetting").checked;save();render();notify("Settings saved.");break;
+ case "friend":{const f=data.friends[i];if(!f)return;data.dm=f.name;const n=prompt("Send a local demo message to "+f.name+":");if(n&&n.trim()){notify("This is a local demo; no message was sent to "+f.name+".")}break}
+ case "friendstatus":{const f=data.friends[i];if(!f)return;f.status=({online:"idle",idle:"dnd",dnd:"offline",offline:"online"})[f.status]||"online";save();render();break}
+ case "addfriend":{const n=$("friendName").value.trim();if(!n)return notify("Enter a display name.");if(data.friends.some(f=>f.name.toLowerCase()===n.toLowerCase()))return notify("That sample friend already exists.");data.friends.push({name:n.slice(0,24),avatar:"🙂",status:"online"});save();render();notify("Sample friend added.");break}
+ case "export":{const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});const url=URL.createObjectURL(blob);const link=document.createElement("a");link.href=url;link.download="free-nitro-hub-demo.json";link.click();URL.revokeObjectURL(url);notify("Demo data export started.");break}
+ case "resetall":if(confirm("Reset all local demo data? This cannot be undone.")){localStorage.removeItem(KEY);data=JSON.parse(JSON.stringify(defaults));messageSearch="";save();render();notify("Demo data reset.")}break;
+ }
+}
+function insertText(e){const input=$("messageInput");if(!input)return;input.value+=e;input.focus();emojiOpen=false;const p=input.selectionStart;input.setSelectionRange(p,p);const pop=document.querySelector(".emoji-pop");if(pop)pop.remove()}
+function sendMessage(){
+ const input=$("messageInput");if(!input)return;
+ const text=input.value.trim();if(!text)return;
+ msgs().push({name:data.user.name,avatar:data.user.avatar,status:data.user.status,text:text.slice(0,1500),time:new Date().toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"}),mine:true,reactions:[]});
+ save();emojiOpen=false;messageSearch="";render();
+ const m=$("messages");if(m)m.scrollTop=m.scrollHeight;
+}
+render();
+// Populate sample messages once, so the website looks active immediately.
+if(!Object.values(data.messages).some(a=>Array.isArray(a)&&a.length)){
+ const samples=[
+  ["Welcome to Free Nitro Hub! 💜","Luna","🌙"],
+  ["This is a local demo chat. Try sending a message below!","PixelFox","🦊"],
+  ["Open the Demo Nitro page to explore themes and cosmetic badges ✨","Nova","⭐"]
+ ];
+ data.messages["0_0"]=samples.map(([text,name,avatar],i)=>({text,name,avatar,status:"online",time:["08:41 PM","08:42 PM","08:43 PM"][i],demo:true,reactions:i===0?[{emoji:"💜",count:2,mine:false},{emoji:"👋",count:1,mine:false}]:[]}));
+ save();render();
+}
+})();
+</script>
+</body>
+</html>
