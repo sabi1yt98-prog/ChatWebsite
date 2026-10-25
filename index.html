@@ -1,1424 +1,350 @@
-```html
+
 <!DOCTYPE html>
-<html lang="en" class="theme-dark">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<meta name="theme-color" content="#1e1f22">
-<title>Free Nitro Hub - Discord Web Client</title>
-<script src="https://cdn.tailwindcss.com"></script>
-<script>
-  tailwind.config = {
-    darkMode: 'class',
-    theme: {
-      extend: {
-        colors: {
-          discord: {
-            sidebar: 'var(--bg-sidebar)',
-            channels: 'var(--bg-channels)',
-            chat: 'var(--bg-chat)',
-            userbar: 'var(--bg-userbar)',
-            hover: 'var(--bg-hover)',
-            active: 'var(--bg-active)',
-            brand: '#5865F2',
-            brandHover: '#4752C4',
-            green: '#23a559',
-            yellow: '#f0b232',
-            red: '#f23f43',
-            nitro: '#f47fff',
-            nitroDark: '#ab47bc',
-            text: 'var(--text-normal)',
-            muted: 'var(--text-muted)',
-            header: 'var(--text-header)'
-          }
-        }
-      }
-    }
-  }
-</script>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#17151f">
+<title>Free Nitro Hub</title>
 <style>
 :root {
-  --bg-sidebar: #1e1f22;
-  --bg-channels: #2b2d31;
-  --bg-chat: #313338;
-  --bg-userbar: #232428;
-  --bg-hover: rgba(148, 155, 164, 0.16);
-  --bg-active: rgba(148, 155, 164, 0.24);
-  --text-normal: #dbdee1;
-  --text-muted: #949ba4;
-  --text-header: #f2f3f5;
-  --border-line: #1f2023;
+  --bg:#1e1f22; --side:#18191c; --panel:#232428; --panel2:#2b2d31;
+  --hover:#35373c; --text:#f2f3f5; --muted:#949ba4; --line:#35373c;
+  --purple:#8b5cf6; --purple2:#6d45d6; --green:#23a559;
+  --bubble:#292a2f; --radius:12px;
 }
-
-.theme-midnight {
-  --bg-sidebar: #0b0c14;
-  --bg-channels: #10111b;
-  --bg-chat: #171827;
-  --bg-userbar: #0d0e17;
-  --bg-hover: rgba(255, 255, 255, 0.08);
-  --bg-active: rgba(255, 255, 255, 0.14);
-  --text-normal: #e1e3f0;
-  --text-muted: #787c99;
-  --text-header: #ffffff;
-  --border-line: #1a1b2b;
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:15px/1.45 system-ui,-apple-system,Segoe UI,sans-serif}
+button,input,textarea,select{font:inherit}
+button{cursor:pointer;color:inherit;border:0}
+button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:2px solid var(--purple);outline-offset:2px}
+button:disabled{opacity:.4;cursor:not-allowed}
+.app{height:100dvh;display:flex;overflow:hidden}
+.servers{width:68px;flex-shrink:0;background:var(--side);display:flex;align-items:center;gap:10px;flex-direction:column;padding:12px 8px;overflow:auto}
+.server{width:48px;height:48px;min-height:48px;border-radius:17px;background:var(--panel2);display:grid;place-items:center;font-size:23px;position:relative;transition:.18s}
+.server:hover,.server.active{border-radius:14px;background:var(--purple)}
+.server.active:before{content:"";position:absolute;left:-8px;width:4px;height:30px;border-radius:4px;background:white}
+.server.add{color:#48d18b;font-size:27px}
+.left{width:238px;min-width:190px;background:var(--side);display:flex;flex-direction:column;flex-shrink:0}
+.brand{height:62px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;border-bottom:1px solid var(--line);font-weight:800;font-size:17px}
+.brandmark{background:var(--purple);border-radius:10px;padding:5px 7px;margin-right:8px}
+.brandname{display:flex;align-items:center}
+.iconbtn{background:transparent;border-radius:8px;padding:8px;font-size:17px}
+.iconbtn:hover{background:var(--hover)}
+.serverhead{padding:17px 14px 10px;font-size:12px;text-transform:uppercase;color:var(--muted);font-weight:750;letter-spacing:.7px}
+.channels{overflow-y:auto;flex:1;padding:0 9px}
+.channel{display:flex;align-items:center;gap:9px;width:100%;text-align:left;padding:9px 10px;border-radius:7px;background:transparent;color:var(--muted);margin-bottom:2px}
+.channel:hover,.channel.active{background:var(--hover);color:var(--text)}
+.channel .hash{font-size:20px;color:#737983}
+.channel.active .hash{color:var(--text)}
+.channel .count{margin-left:auto;background:var(--purple);border-radius:20px;padding:1px 6px;font-size:11px;color:white}
+.userbar{padding:10px;background:#202125;display:flex;align-items:center;gap:9px}
+.avatar{width:37px;height:37px;border-radius:50%;background:#45405b;display:grid;place-items:center;font-size:21px;flex-shrink:0;position:relative;border:2px solid transparent}
+.avatar.online:after{content:"";position:absolute;width:10px;height:10px;right:-1px;bottom:-1px;border-radius:50%;background:#35c46a;border:3px solid var(--side)}
+.avatar.idle:after{content:"";position:absolute;width:10px;height:10px;right:-1px;bottom:-1px;border-radius:50%;background:#f0b232;border:3px solid var(--side)}
+.avatar.dnd:after{content:"";position:absolute;width:10px;height:10px;right:-1px;bottom:-1px;border-radius:50%;background:#ed4245;border:3px solid var(--side)}
+.userinfo{min-width:0;flex:1}
+.userinfo strong,.userinfo small{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.userinfo small{color:var(--muted);font-size:11px}
+.main{display:flex;flex:1;min-width:0;flex-direction:column}
+.topbar{height:62px;min-height:62px;padding:0 17px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px}
+.top-title{font-weight:750;display:flex;align-items:center;gap:9px;min-width:0;flex:1}
+.top-title small{font-weight:400;color:var(--muted)}
+.top-actions{display:flex;gap:4px}
+.chatlayout{display:flex;flex:1;min-height:0}
+.chat{flex:1;min-width:0;display:flex;flex-direction:column}
+.welcome{padding:24px 20px 12px}
+.welcome-icon{font-size:33px}
+.welcome h2{font-size:24px;margin:7px 0}
+.welcome p{color:var(--muted);margin:0;font-size:13px}
+.messages{flex:1;overflow-y:auto;padding:10px 18px 18px;scroll-behavior:smooth}
+.day{text-align:center;color:var(--muted);font-size:11px;display:flex;align-items:center;gap:12px;margin:13px 0}
+.day:before,.day:after{content:"";height:1px;background:var(--line);flex:1}
+.message{display:flex;gap:11px;padding:9px 5px;border-radius:7px;margin:1px 0}
+.message:hover{background:var(--bubble)}
+.msgavatar{width:39px;height:39px;border-radius:50%;display:grid;place-items:center;flex-shrink:0;font-size:22px;background:#403b54}
+.msgbody{min-width:0;flex:1}
+.msghead{display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}
+.msghead strong{font-size:14px}
+.time{font-size:10px;color:var(--muted)}
+.msgtext{white-space:pre-wrap;overflow-wrap:anywhere;margin-top:3px}
+.reactions{display:flex;flex-wrap:wrap;gap:5px;margin-top:7px}
+.react{background:var(--panel2);border:1px solid transparent;border-radius:9px;padding:3px 8px;font-size:13px}
+.react:hover,.react.selected{border-color:var(--purple);background:#40345e}
+.msgtools{display:flex;gap:4px;margin-top:6px}
+.msgtools button{background:var(--panel2);border-radius:7px;padding:3px 7px;color:var(--muted);font-size:12px}
+.composerwrap{padding:8px 16px 17px}
+.composer{display:flex;gap:6px;align-items:flex-end;background:var(--panel2);padding:9px;border-radius:12px}
+.composer textarea{flex:1;min-width:0;resize:none;max-height:120px;border:0;background:transparent;color:var(--text);outline:none;padding:6px}
+.composer button{background:transparent;border-radius:8px;padding:7px;font-size:19px}
+.composer button:hover{background:var(--hover)}
+.send{background:var(--purple)!important;font-size:15px!important;padding:9px 13px!important}
+.hint{font-size:10px;color:var(--muted);padding:6px 3px 0}
+.members{width:205px;background:var(--side);padding:16px 11px;overflow-y:auto;flex-shrink:0}
+.membertitle{font-size:11px;color:var(--muted);font-weight:750;text-transform:uppercase;margin:7px 8px 10px}
+.member{display:flex;align-items:center;gap:8px;padding:7px;border-radius:7px;cursor:pointer}
+.member:hover{background:var(--hover)}
+.member .avatar{width:32px;height:32px;font-size:17px}
+.membername{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px}
+.view{flex:1;overflow-y:auto;padding:25px;min-width:0}
+.view h1{font-size:25px;margin:0 0 8px}
+.view h2{font-size:17px;margin:22px 0 10px}
+.muted{color:var(--muted)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:17px;margin:12px 0}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px}
+.btn{background:var(--purple);padding:10px 14px;border-radius:9px;font-weight:700;transition:.15s}
+.btn:hover{background:var(--purple2);transform:translateY(-1px)}
+.btn.secondary{background:var(--panel2);border:1px solid var(--line)}
+.btn.danger{background:#9e353a}
+.btn.small{padding:6px 10px;font-size:12px}
+.input{width:100%;background:var(--side);color:var(--text);border:1px solid var(--line);border-radius:8px;padding:11px;margin:5px 0 12px}
+label{font-size:12px;color:var(--muted);font-weight:650}
+.hero{background:linear-gradient(135deg,#5631a4,#25213b 65%,#202125);border-radius:18px;padding:25px;position:relative;overflow:hidden}
+.hero h1{font-size:31px}
+.hero .sparkle{font-size:45px}
+.tag{display:inline-block;background:#6f4bc4;padding:4px 9px;border-radius:20px;font-size:11px;font-weight:800}
+.feature{background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:15px}
+.feature .emoji{font-size:27px}
+.feature h3{font-size:15px;margin:8px 0 4px}
+.feature p{font-size:12px;color:var(--muted);margin:0}
+.profilehero{background:linear-gradient(120deg,#6843c2,#30294b);height:100px;border-radius:12px 12px 0 0}
+.profiletop{margin-top:-31px;padding:0 15px 12px}
+.bigavatar{width:76px;height:76px;border:6px solid var(--panel);font-size:37px}
+.badges{display:flex;gap:5px;flex-wrap:wrap;margin:8px 0}
+.badge{background:#3b3056;border:1px solid #62489b;padding:4px 8px;border-radius:7px;font-size:11px}
+.statusdot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#35c46a;margin-right:5px}
+.emoji-pop{position:absolute;bottom:100%;left:0;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:9px;display:grid;grid-template-columns:repeat(6,35px);gap:4px;z-index:20;box-shadow:0 8px 30px #0008}
+.emoji-pop button{background:var(--panel2);padding:6px;border-radius:6px;font-size:20px}
+.composer{position:relative}
+.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:#111318;border:1px solid var(--line);border-radius:10px;padding:11px 17px;z-index:100;box-shadow:0 6px 30px #0008;max-width:90%;text-align:center}
+.mobilebar{display:none}
+.empty{text-align:center;padding:35px 10px;color:var(--muted)}
+a{color:#bba5ff}
+.theme-light{--bg:#f3f4f8;--side:#e6e7ed;--panel:#fff;--panel2:#e8e9f0;--hover:#dadce5;--text:#22232a;--muted:#686d78;--line:#d5d7df;--bubble:#f0f0f6}
+.theme-midnight{--bg:#10111b;--side:#0b0c14;--panel:#171827;--panel2:#202136;--hover:#292a43;--line:#2c2d45;--bubble:#1a1b2b}
+@media(max-width:850px){.members{display:none}.left{width:205px}.view{padding:18px}}
+@media(max-width:580px){
+ .app{height:100dvh;padding-bottom:58px}
+ .servers{display:none}
+ .left{display:none}
+ .main{width:100%}
+ .topbar{height:54px;min-height:54px;padding:0 10px}
+ .top-title{font-size:14px}
+ .top-actions .desktop-only{display:none}
+ .welcome{padding:18px 14px 8px}
+ .welcome h2{font-size:21px}
+ .messages{padding:8px 8px 15px}
+ .composerwrap{padding:7px 8px 10px}
+ .composer{padding:6px;gap:2px}
+ .composer textarea{font-size:14px}
+ .view{padding:16px 12px}
+ .hero{padding:19px}
+ .hero h1{font-size:26px}
+ .mobilebar{display:flex;position:fixed;z-index:50;bottom:0;left:0;right:0;height:61px;padding:5px 4px calc(5px + env(safe-area-inset-bottom));background:var(--side);border-top:1px solid var(--line);justify-content:space-around}
+ .mobilebar button{flex:1;background:transparent;border-radius:8px;color:var(--muted);font-size:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px}
+ .mobilebar button span{font-size:20px}
+ .mobilebar button.active{color:#c7b5ff}
+ .mobile-server-select{display:block!important}
+ .profilehero{height:82px}
 }
-
-.theme-amoled {
-  --bg-sidebar: #000000;
-  --bg-channels: #050505;
-  --bg-chat: #0a0a0a;
-  --bg-userbar: #000000;
-  --bg-hover: #1f1f1f;
-  --bg-active: #2a2a2a;
-  --text-normal: #e0e0e0;
-  --text-muted: #757575;
-  --text-header: #ffffff;
-  --border-line: #171717;
-}
-
-.theme-light {
-  --bg-sidebar: #e3e5e8;
-  --bg-channels: #f2f3f5;
-  --bg-chat: #ffffff;
-  --bg-userbar: #ebedef;
-  --bg-hover: rgba(78, 80, 88, 0.12);
-  --bg-active: rgba(78, 80, 88, 0.2);
-  --text-normal: #313338;
-  --text-muted: #5c5e66;
-  --text-header: #060607;
-  --border-line: #e3e5e8;
-}
-
-.theme-neon {
-  --bg-sidebar: #130924;
-  --bg-channels: #1c0d36;
-  --bg-chat: #261247;
-  --bg-userbar: #160a2b;
-  --bg-hover: rgba(244, 127, 255, 0.2);
-  --bg-active: rgba(244, 127, 255, 0.35);
-  --text-normal: #f5d9ff;
-  --text-muted: #aa85c7;
-  --text-header: #ffffff;
-  --border-line: #371863;
-}
-
-body {
-  margin: 0;
-  background-color: var(--bg-sidebar);
-  color: var(--text-normal);
-  font-family: 'gg sans', 'Noto Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-  user-select: none;
-  overflow: hidden;
-}
-
-/* Custom Discord Scrollbar */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-::-webkit-scrollbar-thumb {
-  background: rgba(0, 0, 0, 0.4);
-  border-radius: 4px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(0, 0, 0, 0.6);
-}
-
-/* Discord Avatar Decor Ring Effects */
-.decor-ring-cyberpunk {
-  box-shadow: 0 0 0 3px #00ffcc, 0 0 12px #00ffcc;
-  animation: pulse-ring 2s infinite alternate;
-}
-.decor-ring-sparkle {
-  box-shadow: 0 0 0 3px #f47fff, 0 0 14px #f47fff;
-  animation: rotate-hue 4s linear infinite;
-}
-.decor-ring-flame {
-  box-shadow: 0 0 0 3px #ff4500, 0 0 15px #ff8c00;
-  animation: flame-pulse 1.2s infinite alternate;
-}
-.decor-ring-cat {
-  box-shadow: 0 0 0 3px #ff69b4, 0 0 10px #ff1493;
-}
-.decor-ring-sakura {
-  box-shadow: 0 0 0 3px #ffb7c5, 0 0 12px #ff69b4;
-}
-
-@keyframes pulse-ring {
-  0% { transform: scale(1); }
-  100% { transform: scale(1.03); }
-}
-@keyframes rotate-hue {
-  0% { filter: hue-rotate(0deg); }
-  100% { filter: hue-rotate(360deg); }
-}
-@keyframes flame-pulse {
-  0% { box-shadow: 0 0 0 2px #ff4500, 0 0 8px #ff4500; }
-  100% { box-shadow: 0 0 0 4px #ff8c00, 0 0 18px #ff4500; }
-}
-
-/* Profile Effects Overlay */
-.profile-effect-sakura {
-  background-image: radial-gradient(#ffb7c5 10%, transparent 20%), radial-gradient(#ff69b4 10%, transparent 20%);
-  background-size: 20px 20px;
-  background-position: 0 0, 10px 10px;
-  animation: float-petals 4s linear infinite;
-  opacity: 0.3;
-}
-.profile-effect-glitch {
-  background: repeating-linear-gradient(0deg, rgba(0,255,200,0.15), rgba(0,255,200,0.15) 1px, transparent 1px, transparent 2px);
-  animation: glitch-scan 1s linear infinite;
-}
-.profile-effect-stars {
-  background-image: radial-gradient(white 2px, transparent 2px);
-  background-size: 16px 16px;
-  animation: star-fade 2s ease-in-out infinite alternate;
-  opacity: 0.4;
-}
-@keyframes float-petals {
-  0% { background-position: 0 0, 10px 10px; }
-  100% { background-position: 0 40px, 10px 50px; }
-}
-@keyframes glitch-scan {
-  0% { background-position: 0 0; }
-  100% { background-position: 0 100%; }
-}
-@keyframes star-fade {
-  0% { opacity: 0.2; }
-  100% { opacity: 0.6; }
-}
-
-.spoiler {
-  background: #202225;
-  color: transparent;
-  cursor: pointer;
-  border-radius: 3px;
-  padding: 0 4px;
-}
-.spoiler.revealed {
-  background: rgba(255,255,255,0.1);
-  color: inherit;
-}
+.mobile-server-select{display:none}
 </style>
 </head>
-<body class="h-screen w-screen flex flex-col overflow-hidden text-sm">
-
-  <!-- APP CONTAINER -->
-  <div id="app" class="h-full w-full flex overflow-hidden"></div>
-
-  <!-- MODAL / TOAST OVERLAYS -->
-  <div id="modal-container" class="relative z-50"></div>
-  <div id="toast" class="fixed bottom-16 right-6 md:bottom-6 z-50 hidden bg-[#111214] text-white border border-[#2b2d31] px-4 py-3 rounded-lg shadow-2xl flex items-center gap-3 transition-all duration-200">
-    <span id="toast-icon">✨</span>
-    <span id="toast-msg" class="font-medium text-xs md:text-sm">Notification message</span>
-  </div>
-
+<body>
+<div id="app" class="app"></div>
+<div id="toast" hidden class="toast"></div>
 <script>
 (() => {
-  "use strict";
-
-  // --- STATE & PERSISTENCE ---
-  const STORAGE_KEY = "free_nitro_hub_discord_v2";
-
-  const defaultState = {
-    user: {
-      id: "usr_001",
-      username: "NitroFanatic",
-      discriminator: "0001",
-      avatar: "😎",
-      status: "online", // online, idle, dnd, offline
-      customStatus: "Cruising in Free Nitro Hub 🚀",
-      bio: "Living for cosmetic perks and sleek Discord themes! Mention @NitroBot in chat for instant responses.",
-      decor: "sparkle", // none, cyberpunk, sparkle, flame, cat, sakura
-      effect: "sakura", // none, sakura, glitch, stars
-      bannerColor: "linear-gradient(135deg, #8b5cf6, #ec4899)",
-      bannerGif: "",
-      theme: "dark", // dark, midnight, amoled, light, neon
-      nitroBadge: true,
-      boosterBadge: true,
-      muted: false,
-      deafened: false
-    },
-    activeView: "chat", // chat, friends, nitro, shop, settings, voice, login
-    currentServer: 0,
-    currentChannel: 0,
-    activeDM: null,
-    inVoiceCall: false,
-    currentVoiceChannel: null,
-    pinnedOpen: false,
-    memberListOpen: true,
-    servers: [
-      {
-        id: "srv_001",
-        name: "Free Nitro Hub",
-        icon: "💜",
-        boosts: 14,
-        boostLevel: 3,
-        categories: [
-          {
-            name: "WELCOME & INFO",
-            channels: [
-              { id: "c1", type: "text", name: "welcome", topic: "Welcome to Free Nitro Hub! Meet the community and explore perks.", unread: false },
-              { id: "c2", type: "text", name: "announcements", topic: "Official updates, releases and cosmetic perk news.", unread: true },
-              { id: "c3", type: "text", name: "nitro-giveaways", topic: "Simulated Nitro perks drop here daily! Type !claim to claim.", unread: true }
-            ]
-          },
-          {
-            name: "COMMUNITY CHAT",
-            channels: [
-              { id: "c4", type: "text", name: "general", topic: "General discussions about gaming, tech, and custom themes.", unread: false },
-              { id: "c5", type: "text", name: "memes", topic: "Post your spice & dank memes.", unread: false },
-              { id: "c6", type: "text", name: "bot-commands", topic: "Interact with @NitroBot and trigger interactive features.", unread: false }
-            ]
-          },
-          {
-            name: "VOICE LOUNGE",
-            channels: [
-              { id: "v1", type: "voice", name: "🔊 General Hangout", topic: "Casual voice chat", users: ["Luna 🌙", "PixelFox 🦊"] },
-              { id: "v2", type: "voice", name: "🎮 Gaming Room", topic: "Co-op & Competitive gaming voice", users: ["Nova ⭐"] }
-            ]
-          }
-        ]
-      },
-      {
-        id: "srv_002",
-        name: "Gaming Lounge",
-        icon: "🎮",
-        boosts: 7,
-        boostLevel: 2,
-        categories: [
-          {
-            name: "TEXT CHANNELS",
-            channels: [
-              { id: "c7", type: "text", name: "lfg-chat", topic: "Looking for group! Post your party links.", unread: false },
-              { id: "c8", type: "text", name: "clips-and-highlights", topic: "Share epic gaming moments.", unread: false }
-            ]
-          },
-          {
-            name: "VOICE CHANNELS",
-            channels: [
-              { id: "v3", type: "voice", name: "🔊 Squad 1", topic: "Competitive channel", users: [] }
-            ]
-          }
-        ]
-      },
-      {
-        id: "srv_003",
-        name: "Creative Corner",
-        icon: "🎨",
-        boosts: 3,
-        boostLevel: 1,
-        categories: [
-          {
-            name: "ART & DESIGN",
-            channels: [
-              { id: "c9", type: "text", name: "showcase", topic: "Show off your artwork, UI themes, and code creations.", unread: false },
-              { id: "c10", type: "text", name: "feedback", topic: "Constructive feedback and design critiques.", unread: false }
-            ]
-          }
-        ]
-      }
-    ],
-    messages: {
-      "srv_001_c1": [
-        { id: "m1", user: "NitroBot", avatar: "🤖", bot: true, text: "Welcome to **Free Nitro Hub**! 💎 Enjoy fully dynamic Discord-style UI with customizable themes, avatar decorations, and soundboard effects.", time: "10:00 AM", reactions: [{ emoji: "👋", count: 8, mine: true }, { emoji: "💜", count: 12, mine: false }], pinned: true },
-        { id: "m2", user: "Luna", avatar: "🌙", bot: false, text: "Hey everyone! Don't forget to check out the **Free Demo Nitro** tab on the sidebar to change your avatar decor!", time: "10:05 AM", reactions: [{ emoji: "✨", count: 4, mine: false }] }
-      ],
-      "srv_001_c3": [
-        { id: "m3", user: "GiveawayBot", avatar: "🎁", bot: true, text: "🎉 **SIMULATED NITRO DROP HAS BEGUN!** 🎉\nType `!claim` in this channel to claim your cosmetic Nitro badge!", time: "10:15 AM", reactions: [{ emoji: "🎁", count: 19, mine: false }], pinned: true }
-      ],
-      "srv_001_c4": [
-        { id: "m4", user: "PixelFox", avatar: "🦊", bot: false, text: "Anyone tried the custom soundboard yet? The Anime Wow sound is top tier haha!", time: "10:20 AM", reactions: [{ emoji: "😂", count: 5, mine: true }] },
-        { id: "m5", user: "Nova", avatar: "⭐", bot: false, text: "Check this hidden message: ||Discord UI clones are awesome!||", time: "10:22 AM", reactions: [] }
-      ]
-    },
-    friends: [
-      { id: "f1", name: "Luna", tag: "1337", avatar: "🌙", status: "online", customStatus: "Creating digital art 🎨", activity: "Playing Visual Studio Code" },
-      { id: "f2", name: "PixelFox", tag: "4040", avatar: "🦊", status: "idle", customStatus: "Afk eating snacks 🍕", activity: "Streaming Cyberpunk 2077" },
-      { id: "f3", name: "Nova", tag: "9999", avatar: "⭐", status: "dnd", customStatus: "Do not disturb - Coding 💻", activity: "In a voice channel" },
-      { id: "f4", name: "Cloudy", tag: "0002", avatar: "☁️", status: "offline", customStatus: "Sleeping 😴", activity: "" }
-    ],
-    pendingFriends: [
-      { id: "pf1", name: "CyberGamer", tag: "7777", avatar: "⚡", type: "incoming" }
-    ],
-    soundboard: [
-      { name: "Airhorn", emoji: "📢", sound: "airhorn" },
-      { name: "Quack", emoji: "🦆", sound: "quack" },
-      { name: "Ba-Dum-Tss", emoji: "🥁", sound: "badumtss" },
-      { name: "Anime Wow", emoji: "✨", sound: "animewow" },
-      { name: "GG Bell", emoji: "🔔", sound: "ggbell" },
-      { name: "Victory", emoji: "🎺", sound: "victory" }
-    ]
-  };
-
-  let state = loadState();
-
-  function loadState() {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        return { ...defaultState, ...parsed, user: { ...defaultState.user, ...parsed.user } };
-      }
-    } catch (e) {
-      console.error("Failed to load local state", e);
-    }
-    return structuredClone(defaultState);
-  }
-
-  function saveState() {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-    } catch (e) {
-      console.error("Failed to save state", e);
-    }
-  }
-
-  // --- AUDIO SYNTHESIZER FOR SOUNDBOARD & CHAT ---
-  const AudioCtx = window.AudioContext || window.webkitAudioContext;
-  let audioCtx = null;
-
-  function initAudio() {
-    if (!audioCtx) audioCtx = new AudioCtx();
-  }
-
-  function playSound(type) {
-    initAudio();
-    if (!audioCtx) return;
-    const now = audioCtx.currentTime;
-    
-    if (type === "airhorn") {
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-      osc.type = "sawtooth";
-      osc.frequency.setValueAtTime(466.16, now); // Bb4
-      osc.frequency.setValueAtTime(466.16, now + 0.1);
-      osc.frequency.setValueAtTime(622.25, now + 0.15); // Eb5
-      gain.gain.setValueAtTime(0.3, now);
-      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
-      osc.connect(gain);
-      gain.connect(audioCtx.destination);
-      osc.start(now);
-      osc.stop(now + 0.5);
-    } else if (type === "quack") {
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-      osc.type = "triangle";
-      osc.frequency.setValueAtTime(300, now);
-      osc.frequency.linearRampToValueAtTime(150, now + 0.2);
-      gain.gain.setValueAtTime(0.4, now);
-      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
-      osc.connect(gain);
-      gain.connect(audioCtx.destination);
-      osc.start(now);
-      osc.stop(now + 0.25);
-    } else if (type === "badumtss") {
-      // Drum kick + snare simulation
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-      osc.frequency.setValueAtTime(120, now);
-      osc.frequency.exponentialRampToValueAtTime(0.01, now + 0.15);
-      gain.gain.setValueAtTime(0.5, now);
-      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
-      osc.connect(gain);
-      gain.connect(audioCtx.destination);
-      osc.start(now);
-      osc.stop(now + 0.15);
-    } else if (type === "animewow") {
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-      osc.type = "sine";
-      osc.frequency.setValueAtTime(300, now);
-      osc.frequency.exponentialRampToValueAtTime(800, now + 0.4);
-      gain.gain.setValueAtTime(0.3, now);
-      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.45);
-      osc.connect(gain);
-      gain.connect(audioCtx.destination);
-      osc.start(now);
-      osc.stop(now + 0.45);
-    } else if (type === "ggbell") {
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-      osc.type = "sine";
-      osc.frequency.setValueAtTime(987.77, now); // B5
-      gain.gain.setValueAtTime(0.4, now);
-      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.8);
-      osc.connect(gain);
-      gain.connect(audioCtx.destination);
-      osc.start(now);
-      osc.stop(now + 0.8);
-    } else if (type === "victory") {
-      const notes = [440, 554.37, 659.25, 880];
-      notes.forEach((freq, idx) => {
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        osc.frequency.setValueAtTime(freq, now + idx * 0.1);
-        gain.gain.setValueAtTime(0.2, now + idx * 0.1);
-        gain.gain.exponentialRampToValueAtTime(0.01, now + idx * 0.1 + 0.25);
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
-        osc.start(now + idx * 0.1);
-        osc.stop(now + idx * 0.1 + 0.25);
-      });
-    } else if (type === "message") {
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-      osc.frequency.setValueAtTime(600, now);
-      osc.frequency.exponentialRampToValueAtTime(800, now + 0.08);
-      gain.gain.setValueAtTime(0.15, now);
-      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
-      osc.connect(gain);
-      gain.connect(audioCtx.destination);
-      osc.start(now);
-      osc.stop(now + 0.1);
-    }
-  }
-
-  // --- HELPERS ---
-  function esc(s) {
-    return String(s ?? "").replace(/[&<>"']/g, c => ({
-      "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
-    }[c]));
-  }
-
-  function showToast(msg, icon = "✨") {
-    const t = document.getElementById("toast");
-    document.getElementById("toast-msg").textContent = msg;
-    document.getElementById("toast-icon").textContent = icon;
-    t.classList.remove("hidden");
-    t.classList.add("flex");
-    setTimeout(() => {
-      t.classList.add("hidden");
-      t.classList.remove("flex");
-    }, 2800);
-  }
-
-  function getCurrentServer() {
-    return state.servers[state.currentServer] || state.servers[0];
-  }
-
-  function getCurrentChannel() {
-    const srv = getCurrentServer();
-    let flat = [];
-    srv.categories.forEach(cat => flat.push(...cat.channels));
-    return flat[state.currentChannel] || flat[0];
-  }
-
-  function getChannelKey() {
-    const srv = getCurrentServer();
-    const ch = getCurrentChannel();
-    return `${srv.id}_${ch.id}`;
-  }
-
-  function getMessages() {
-    const key = getChannelKey();
-    if (!state.messages[key]) state.messages[key] = [];
-    return state.messages[key];
-  }
-
-  function parseMarkdown(text) {
-    let raw = esc(text);
-    // Bold
-    raw = raw.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-    // Italics
-    raw = raw.replace(/\*(.*?)\*/g, '<em>$1</em>');
-    // Code inline
-    raw = raw.replace(/`([^`]+)`/g, '<code class="bg-[#1e1f22] text-[#e2e4e9] px-1.5 py-0.5 rounded font-mono text-xs">$1</code>');
-    // Code block
-    raw = raw.replace(/```(.*?)\n([\s\S]*?)```/g, '<pre class="bg-[#1e1f22] border border-[#2b2d31] p-3 rounded-lg text-xs font-mono text-[#4717f6] overflow-x-auto my-2"><code>$2</code></pre>');
-    // Spoilers ||text||
-    raw = raw.replace(/\|\|(.*?)\|\|/g, '<span class="spoiler" onclick="this.classList.toggle(\'revealed\')">$1</span>');
-    // User mentions @NitroBot
-    raw = raw.replace(/@([a-zA-Z0-9_]+)/g, '<span class="bg-[#5865F2]/20 text-[#c9cdfb] font-semibold px-1 py-0.5 rounded hover:bg-[#5865F2] hover:text-white transition">@$1</span>');
-    return raw;
-  }
-
-  // --- BOT RESPONSE ENGINE ---
-  function triggerBotResponse(userMsg) {
-    const lower = userMsg.toLowerCase();
-    const ch = getCurrentChannel();
-    
-    setTimeout(() => {
-      let replyText = "";
-      let botName = "NitroBot";
-      let botAvatar = "🤖";
-
-      if (ch.name === "nitro-giveaways" && lower.includes("!claim")) {
-        botName = "GiveawayBot";
-        botAvatar = "🎁";
-        replyText = `🎉 Congratulations **${state.user.username}**! You claimed the **Free Demo Nitro Booster Badge**! Go to *My Profile* to see your decoration preview.`;
-      } else if (lower.includes("@nitrobot") || lower.includes("hello") || lower.includes("nitro")) {
-        const responses = [
-          "Hey there! 💜 Free Nitro Hub lets you preview custom themes, animated avatar decor, and soundboard sounds!",
-          "Did someone say Nitro? You can change your app appearance in Settings -> Themes!",
-          "I am NitroBot! Try clicking on the Soundboard buttons or custom avatar decorations in the shop!",
-          "Beep boop! You're currently testing the ultimate Discord web interface clone!"
-        ];
-        replyText = responses[Math.floor(Math.random() * responses.length)];
-      } else if (lower.includes("!sound") || lower.includes("music")) {
-        replyText = "🎵 Soundboard activated! Click any sound card in the Nitro Hub tab to play synthesized Web Audio effects!";
-      }
-
-      if (replyText) {
-        const key = getChannelKey();
-        const msgObj = {
-          id: "m_" + Date.now(),
-          user: botName,
-          avatar: botAvatar,
-          bot: true,
-          text: replyText,
-          time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-          reactions: [{ emoji: "💜", count: 1, mine: false }]
-        };
-        state.messages[key].push(msgObj);
-        saveState();
-        playSound("message");
-        render();
-        scrollToBottom();
-      }
-    }, 900);
-  }
-
-  function scrollToBottom() {
-    setTimeout(() => {
-      const container = document.getElementById("messages-container");
-      if (container) container.scrollTop = container.scrollHeight;
-    }, 50);
-  }
-
-  // --- RENDER COMPONENT SYSTEM ---
-  function render() {
-    // Apply theme class to document
-    document.documentElement.className = `theme-${state.user.theme}`;
-
-    const app = document.getElementById("app");
-    app.innerHTML = `
-      <!-- 1. SERVER NAVIGATION RAIL -->
-      ${renderServerRail()}
-
-      <!-- 2. CHANNEL SIDEBAR / DM SIDEBAR -->
-      ${renderChannelSidebar()}
-
-      <!-- 3. MAIN CONTENT AREA -->
-      <div class="flex-1 flex flex-col min-w-0 h-full bg-discord-chat relative">
-        ${renderHeader()}
-        
-        <div class="flex-1 flex min-h-0 w-full overflow-hidden">
-          ${renderMainView()}
-
-          <!-- MEMBER LIST (CHAT VIEW ONLY) -->
-          ${state.activeView === "chat" && state.memberListOpen ? renderMemberList() : ''}
-        </div>
-      </div>
-    `;
-
-    bindEvents();
-  }
-
-  // 1. SERVER RAIL
-  function renderServerRail() {
-    return `
-      <nav class="w-[72px] bg-discord-sidebar flex flex-col items-center py-3 gap-2 flex-shrink-0 z-20 border-r border-[#1f2023]/40">
-        <!-- DM Home Button -->
-        <button data-action="nav-dm" class="relative group w-12 h-12 rounded-[24px] hover:rounded-[16px] bg-discord-channels flex items-center justify-center transition-all duration-200 ${state.activeView === 'friends' ? '!rounded-[16px] !bg-discord-brand text-white' : 'text-gray-200 hover:bg-discord-brand hover:text-white'}">
-          <div class="absolute -left-3 w-2 bg-white rounded-r-full transition-all duration-200 ${state.activeView === 'friends' ? 'h-10' : 'h-0 group-hover:h-5'}"></div>
-          <svg class="w-7 h-7 fill-current" viewBox="0 0 28 20">
-            <path d="M23.0212 1.67672C21.2607 0.86685 19.3734 0.275988 17.4124 0C17.1472 0.473523 16.848 1.09645 16.6366 1.59973C14.5492 1.28424 12.4721 1.28424 10.4127 1.59973C10.2013 1.09645 9.89674 0.473523 9.62624 0C7.66008 0.275988 5.77274 0.871928 4.01736 1.6818C0.490909 6.94828 -0.460833 12.0857 0.149872 17.1524C2.48596 18.8772 4.74971 19.9272 6.97448 20C7.5262 19.2513 8.02052 18.4552 8.44853 17.6185C7.64366 17.3142 7.87327 16.9644 6.1127 16.5485C6.30538 16.4065 6.49298 16.2594 6.67549 16.1073C11.0225 18.1108 15.7486 18.1108 20.0451 16.1073C20.2276 16.2594 20.4152 16.4065 20.6079 16.5485C19.8423 16.9695 19.0718 17.3193 18.2669 17.6236C18.6949 18.4603 19.1892 19.2564 19.7409 20C21.9657 19.9272 24.2344 18.8772 26.5705 17.1524C27.294 11.2337 25.378 6.13682 23.0212 1.67672ZM9.08182 14.0076C7.75705 14.0076 6.67035 12.7853 6.67035 11.2841C6.67035 9.78286 7.73167 8.56062 9.08182 8.56062C10.432 8.56062 11.5187 9.78286 11.4933 11.2841C11.4933 12.7853 10.432 14.0076 9.08182 14.0076ZM17.6386 14.0076C16.3138 14.0076 15.2271 12.7853 15.2271 11.2841C15.2271 9.78286 16.2884 8.56062 17.6386 8.56062C18.9888 8.56062 20.0755 9.78286 20.0501 11.2841C20.0501 12.7853 18.9888 14.0076 17.6386 14.0076Z"/>
-          </svg>
-        </button>
-
-        <div class="w-8 h-[2px] bg-discord-hover rounded my-1"></div>
-
-        <!-- Server List -->
-        <div class="flex-1 w-full flex flex-col items-center gap-2 overflow-y-auto no-scrollbar">
-          ${state.servers.map((srv, idx) => `
-            <button data-action="select-server" data-idx="${idx}" class="relative group w-12 h-12 rounded-[24px] hover:rounded-[16px] bg-discord-channels flex items-center justify-center text-xl font-semibold transition-all duration-200 ${state.activeView === 'chat' && state.currentServer === idx ? '!rounded-[16px] !bg-discord-brand text-white' : 'text-gray-200 hover:bg-discord-brand hover:text-white'}">
-              <div class="absolute -left-3 w-2 bg-white rounded-r-full transition-all duration-200 ${state.activeView === 'chat' && state.currentServer === idx ? 'h-10' : 'h-0 group-hover:h-5'}"></div>
-              ${srv.icon}
-              ${srv.boostLevel === 3 ? `<span class="absolute -bottom-1 -right-1 bg-discord-nitro text-[10px] px-1 rounded-full text-black font-bold">L3</span>` : ''}
-            </button>
-          `).join('')}
-
-          <!-- Add Server Button -->
-          <button data-action="add-server-modal" class="group w-12 h-12 rounded-[24px] hover:rounded-[16px] bg-discord-channels hover:bg-discord-green text-discord-green hover:text-white flex items-center justify-center text-2xl font-light transition-all duration-200" title="Add a Server">
-            +
-          </button>
-
-          <!-- Nitro Perk Hub Quick Access -->
-          <button data-action="nav-nitro" class="relative group w-12 h-12 rounded-[24px] hover:rounded-[16px] bg-gradient-to-tr from-purple-600 to-pink-500 hover:from-purple-500 hover:to-pink-400 text-white flex items-center justify-center text-xl transition-all duration-200 ${state.activeView === 'nitro' ? '!rounded-[16px] ring-2 ring-pink-400' : ''}" title="Free Demo Nitro Hub">
-            💎
-          </button>
-        </div>
-
-        <!-- User Profile Quick Settings -->
-        <button data-action="nav-settings" class="w-12 h-12 rounded-full overflow-hidden border-2 border-transparent hover:border-discord-brand transition relative group">
-          <div class="w-full h-full bg-purple-900 flex items-center justify-center text-xl ${state.user.decor ? 'decor-ring-' + state.user.decor : ''}">
-            ${state.user.avatar}
-          </div>
-          <div class="absolute bottom-0 right-0 w-3.5 h-3.5 rounded-full border-2 border-discord-sidebar ${state.user.status === 'online' ? 'bg-discord-green' : state.user.status === 'idle' ? 'bg-discord-yellow' : state.user.status === 'dnd' ? 'bg-discord-red' : 'bg-gray-500'}"></div>
-        </button>
-      </nav>
-    `;
-  }
-
-  // 2. CHANNEL SIDEBAR & USER PANEL
-  function renderChannelSidebar() {
-    const srv = getCurrentServer();
-    
-    return `
-      <div class="w-60 bg-discord-channels flex flex-col h-full flex-shrink-0 z-10 border-r border-[#1f2023]/30">
-        <!-- SERVER / DM HEADER -->
-        <div class="h-12 px-4 border-b border-[#1f2023] flex items-center justify-between shadow-sm cursor-pointer hover:bg-discord-hover transition" data-action="server-menu">
-          <h1 class="font-bold text-discord-header text-base truncate flex items-center gap-1.5">
-            ${state.activeView === 'friends' ? 'Direct Messages' : `${srv.name} <span class="text-xs text-discord-nitro font-normal">💎 L${srv.boostLevel}</span>`}
-          </h1>
-          <svg class="w-4 h-4 text-discord-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-        </div>
-
-        <!-- CATEGORIES & CHANNELS -->
-        <div class="flex-1 overflow-y-auto px-2 py-3 space-y-4">
-          ${state.activeView === 'friends' ? renderDMSidebarList() : renderServerCategories(srv)}
-        </div>
-
-        <!-- ACTIVE VOICE CONNECTION BAR (IF CONNECTED) -->
-        ${state.inVoiceCall ? `
-          <div class="bg-[#111214] p-2.5 border-t border-[#1f2023] flex items-center justify-between">
-            <div class="flex items-center gap-2 min-w-0">
-              <span class="text-discord-green animate-pulse">🔊</span>
-              <div class="truncate">
-                <div class="text-xs font-bold text-discord-green truncate">Voice Connected</div>
-                <div class="text-[11px] text-discord-muted truncate">${state.currentVoiceChannel || 'Voice Room'}</div>
-              </div>
-            </div>
-            <button data-action="disconnect-voice" class="text-discord-red hover:bg-discord-red/20 p-1.5 rounded transition" title="Disconnect">
-              ✖
-            </button>
-          </div>
-        ` : ''}
-
-        <!-- USER BAR AT BOTTOM -->
-        <div class="h-14 bg-discord-userbar px-2 flex items-center justify-between gap-1 border-t border-[#1f2023]">
-          <button data-action="nav-settings" class="flex items-center gap-2 p-1 rounded-md hover:bg-discord-hover min-w-0 flex-1 text-left">
-            <div class="relative flex-shrink-0">
-              <div class="w-8 h-8 rounded-full bg-purple-900 flex items-center justify-center text-sm ${state.user.decor ? 'decor-ring-' + state.user.decor : ''}">
-                ${state.user.avatar}
-              </div>
-              <div class="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-discord-userbar ${state.user.status === 'online' ? 'bg-discord-green' : state.user.status === 'idle' ? 'bg-discord-yellow' : state.user.status === 'dnd' ? 'bg-discord-red' : 'bg-gray-500'}"></div>
-            </div>
-            <div class="min-w-0 flex-1 leading-tight">
-              <div class="font-bold text-discord-header text-xs truncate flex items-center gap-1">
-                ${esc(state.user.username)}
-                ${state.user.nitroBadge ? '<span class="text-[10px] text-discord-nitro">💎</span>' : ''}
-              </div>
-              <div class="text-[10px] text-discord-muted truncate">#${state.user.discriminator}</div>
-            </div>
-          </button>
-
-          <div class="flex items-center gap-0.5 text-discord-muted">
-            <button data-action="toggle-mute" class="p-1.5 hover:bg-discord-hover hover:text-discord-header rounded ${state.user.muted ? 'text-discord-red' : ''}" title="${state.user.muted ? 'Unmute' : 'Mute'}">
-              ${state.user.muted ? '🎙️❌' : '🎙️'}
-            </button>
-            <button data-action="toggle-deafen" class="p-1.5 hover:bg-discord-hover hover:text-discord-header rounded ${state.user.deafened ? 'text-discord-red' : ''}" title="${state.user.deafened ? 'Undeafen' : 'Deafen'}">
-              ${state.user.deafened ? '🎧❌' : '🎧'}
-            </button>
-            <button data-action="nav-settings" class="p-1.5 hover:bg-discord-hover hover:text-discord-header rounded" title="User Settings">
-              ⚙️
-            </button>
-          </div>
-        </div>
-      </div>
-    `;
-  }
-
-  function renderServerCategories(srv) {
-    let globalChannelIndex = 0;
-    return srv.categories.map(cat => `
-      <div>
-        <div class="flex items-center justify-between text-xs font-bold text-discord-muted px-1 mb-1 tracking-wider uppercase">
-          <span>${cat.name}</span>
-          <button data-action="add-channel" class="hover:text-discord-header text-base">+</button>
-        </div>
-        <div class="space-y-0.5">
-          ${cat.channels.map(ch => {
-            const currentIdx = globalChannelIndex++;
-            const isActive = state.activeView === 'chat' && state.currentChannel === currentIdx;
-            
-            if (ch.type === "voice") {
-              return `
-                <button data-action="join-voice" data-name="${esc(ch.name)}" class="w-full flex items-center justify-between px-2 py-1.5 rounded text-discord-muted hover:bg-discord-hover hover:text-discord-header transition group">
-                  <div class="flex items-center gap-2 truncate">
-                    <span class="text-base">🔊</span>
-                    <span class="text-sm truncate">${esc(ch.name)}</span>
-                  </div>
-                  <span class="text-[10px] bg-discord-sidebar px-1.5 py-0.5 rounded text-discord-green">Join</span>
-                </button>
-                ${(ch.users || []).map(u => `
-                  <div class="ml-6 flex items-center gap-2 py-1 px-2 text-xs text-discord-muted">
-                    <span class="w-2 h-2 rounded-full bg-discord-green"></span>
-                    <span>${esc(u)}</span>
-                  </div>
-                `).join('')}
-              `;
-            }
-
-            return `
-              <button data-action="select-channel" data-idx="${currentIdx}" class="w-full flex items-center justify-between px-2 py-1.5 rounded transition ${isActive ? 'bg-discord-active text-discord-header font-medium' : 'text-discord-muted hover:bg-discord-hover hover:text-discord-header'}">
-                <div class="flex items-center gap-2 truncate">
-                  <span class="text-lg text-discord-muted">#</span>
-                  <span class="text-sm truncate">${esc(ch.name)}</span>
-                </div>
-                ${ch.unread ? `<span class="w-2 h-2 rounded-full bg-discord-brand"></span>` : ''}
-              </button>
-            `;
-          }).join('')}
-        </div>
-      </div>
-    `).join('');
-  }
-
-  function renderDMSidebarList() {
-    return `
-      <div class="space-y-1">
-        <button data-action="nav-friends" class="w-full flex items-center gap-3 px-3 py-2 rounded text-discord-header bg-discord-active font-medium">
-          <span class="text-lg">♧</span> Friends
-        </button>
-        <button data-action="nav-nitro" class="w-full flex items-center gap-3 px-3 py-2 rounded text-discord-nitro hover:bg-discord-hover transition font-medium">
-          <span class="text-lg">💎</span> Free Nitro Hub
-        </button>
-        <button data-action="nav-shop" class="w-full flex items-center gap-3 px-3 py-2 rounded text-pink-400 hover:bg-discord-hover transition font-medium">
-          <span class="text-lg">🛍️</span> Profile Shop
-        </button>
-      </div>
-
-      <div class="pt-4">
-        <div class="text-xs font-bold text-discord-muted px-2 mb-2 uppercase tracking-wider flex items-center justify-between">
-          <span>Direct Messages</span>
-          <button data-action="add-dm" class="hover:text-discord-header">+</button>
-        </div>
-        <div class="space-y-0.5">
-          ${state.friends.map(f => `
-            <button data-action="open-dm" data-id="${f.id}" class="w-full flex items-center gap-2.5 px-2 py-2 rounded text-discord-muted hover:bg-discord-hover hover:text-discord-header transition group">
-              <div class="relative">
-                <div class="w-8 h-8 rounded-full bg-purple-900 flex items-center justify-center text-sm">
-                  ${f.avatar}
-                </div>
-                <div class="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border-2 border-discord-channels ${f.status === 'online' ? 'bg-discord-green' : f.status === 'idle' ? 'bg-discord-yellow' : f.status === 'dnd' ? 'bg-discord-red' : 'bg-gray-500'}"></div>
-              </div>
-              <div class="truncate text-left flex-1">
-                <div class="text-sm font-medium text-discord-header truncate">${esc(f.name)}</div>
-                <div class="text-[11px] text-discord-muted truncate">${esc(f.customStatus || f.status)}</div>
-              </div>
-            </button>
-          `).join('')}
-        </div>
-      </div>
-    `;
-  }
-
-  // 3. HEADER BAR
-  function renderHeader() {
-    const ch = getCurrentChannel();
-    return `
-      <header class="h-12 px-4 border-b border-[#1f2023] flex items-center justify-between bg-discord-chat z-10">
-        <div class="flex items-center gap-3 min-w-0">
-          ${state.activeView === 'chat' ? `
-            <span class="text-2xl text-discord-muted">#</span>
-            <h2 class="font-bold text-discord-header text-base truncate">${esc(ch.name)}</h2>
-            <div class="hidden md:block w-[1px] h-4 bg-discord-muted/30 mx-1"></div>
-            <p class="hidden md:block text-xs text-discord-muted truncate max-w-xs">${esc(ch.topic)}</p>
-          ` : state.activeView === 'friends' ? `
-            <span class="text-xl">♧</span>
-            <h2 class="font-bold text-discord-header text-base">Friends</h2>
-          ` : state.activeView === 'nitro' ? `
-            <span class="text-xl">💎</span>
-            <h2 class="font-bold text-discord-header text-base">Free Demo Nitro Hub</h2>
-          ` : state.activeView === 'shop' ? `
-            <span class="text-xl">🛍️</span>
-            <h2 class="font-bold text-discord-header text-base">Profile Cosmetics Shop</h2>
-          ` : `
-            <span class="text-xl">⚙️</span>
-            <h2 class="font-bold text-discord-header text-base">User Settings</h2>
-          `}
-        </div>
-
-        <div class="flex items-center gap-3 text-discord-muted">
-          ${state.activeView === 'chat' ? `
-            <button data-action="toggle-pinned" class="hover:text-discord-header p-1" title="Pinned Messages">
-              📌
-            </button>
-            <button data-action="toggle-members" class="hover:text-discord-header p-1" title="Member List">
-              👥
-            </button>
-          ` : ''}
-
-          <button data-action="search-modal" class="bg-discord-sidebar hover:bg-black/30 px-2.5 py-1 rounded text-xs flex items-center gap-2 text-discord-muted">
-            <span>Search</span>
-            <kbd class="bg-discord-channels px-1.5 py-0.5 rounded text-[10px]">ctrl+k</kbd>
-          </button>
-        </div>
-      </header>
-    `;
-  }
-
-  // 4. MAIN VIEW SWITCHER
-  function renderMainView() {
-    switch (state.activeView) {
-      case 'chat': return renderChatView();
-      case 'friends': return renderFriendsView();
-      case 'nitro': return renderNitroHubView();
-      case 'shop': return renderShopView();
-      case 'settings': return renderSettingsView();
-      default: return renderChatView();
-    }
-  }
-
-  // CHAT VIEW
-  function renderChatView() {
-    const ch = getCurrentChannel();
-    const msgs = getMessages();
-
-    return `
-      <div class="flex-1 flex flex-col h-full min-w-0 bg-discord-chat relative">
-        <!-- MESSAGES SCROLL LIST -->
-        <div id="messages-container" class="flex-1 overflow-y-auto p-4 space-y-4">
-          <!-- WELCOME CHANNEL BANNER -->
-          <div class="my-6 space-y-2">
-            <div class="w-16 h-16 rounded-full bg-discord-hover flex items-center justify-center text-4xl text-discord-header">
-              #
-            </div>
-            <h1 class="text-3xl font-bold text-discord-header">Welcome to #${esc(ch.name)}!</h1>
-            <p class="text-discord-muted text-sm">This is the start of the #${esc(ch.name)} channel. ${esc(ch.topic)}</p>
-          </div>
-
-          <div class="w-full h-[1px] bg-discord-hover my-4"></div>
-
-          <!-- MESSAGE LIST -->
-          ${msgs.map((m, idx) => `
-            <div class="group relative flex gap-3 p-1 rounded hover:bg-discord-hover/50 transition">
-              <div class="w-10 h-10 rounded-full bg-purple-900 flex items-center justify-center text-lg flex-shrink-0 mt-0.5">
-                ${m.avatar}
-              </div>
-              <div class="flex-1 min-w-0">
-                <div class="flex items-center gap-2">
-                  <span class="font-bold text-discord-header text-sm">${esc(m.user)}</span>
-                  ${m.bot ? `<span class="bg-discord-brand text-white text-[10px] px-1.5 py-0.2 rounded font-bold uppercase">BOT</span>` : ''}
-                  <span class="text-[11px] text-discord-muted">${m.time}</span>
-                </div>
-                <div class="text-discord-text text-sm mt-0.5 whitespace-pre-wrap">${parseMarkdown(m.text)}</div>
-
-                <!-- REACTIONS -->
-                ${m.reactions && m.reactions.length ? `
-                  <div class="flex flex-wrap gap-1 mt-2">
-                    ${m.reactions.map((r, rIdx) => `
-                      <button data-action="toggle-reaction" data-[#msgidx]="${idx}" data-ridx="${rIdx}" class="px-2 py-0.5 rounded-md border ${r.mine ? 'bg-discord-brand/20 border-discord-brand text-discord-brand' : 'bg-discord-channels border-transparent text-discord-muted'} hover:bg-discord-hover text-xs flex items-center gap-1 transition">
-                        <span>${r.emoji}</span>
-                        <span class="font-semibold">${r.count}</span>
-                      </button>
-                    `).join('')}
-                  </div>
-                ` : ''}
-              </div>
-
-              <!-- HOVER TOOLBAR -->
-              <div class="absolute right-2 -top-3 hidden group-hover:flex items-center bg-discord-channels border border-[#1f2023] rounded shadow-md px-1 py-0.5 text-xs text-discord-muted">
-                <button data-action="quick-react" data-idx="${idx}" class="p-1 hover:text-discord-header" title="Add Reaction">😀</button>
-                <button data-action="pin-msg" data-idx="${idx}" class="p-1 hover:text-discord-header" title="Pin Message">📌</button>
-                <button data-action="delete-msg" data-idx="${idx}" class="p-1 hover:text-discord-red" title="Delete">🗑️</button>
-              </div>
-            </div>
-          `).join('')}
-        </div>
-
-        <!-- COMPOSER INPUT -->
-        <div class="p-4 bg-discord-chat">
-          <div class="bg-discord-channels rounded-lg p-2.5 flex items-end gap-2 border border-transparent focus-within:border-discord-brand transition">
-            <button data-action="open-emoji-picker" class="p-1.5 text-discord-muted hover:text-discord-header rounded-full hover:bg-discord-hover text-lg">
-              😊
-            </button>
-            <textarea id="chat-input" rows="1" class="flex-1 bg-transparent text-discord-header text-sm focus:outline-none resize-none max-h-32 placeholder:text-discord-muted" placeholder="Message #${esc(ch.name)} (Supports **bold**, *italics*, \`code\`, ||spoilers||)"></textarea>
-            <button data-action="send-msg" class="bg-discord-brand hover:bg-discord-brandHover text-white px-3 py-1.5 rounded-md text-sm font-medium transition">
-              Send
-            </button>
-          </div>
-          <div class="flex justify-between text-[11px] text-discord-muted px-1 mt-1">
-            <span>Tip: Mention <strong class="text-discord-brand">@NitroBot</strong> or type <code class="bg-discord-channels px-1 rounded">!claim</code> in #nitro-giveaways</span>
-            <span>Press Enter to send</span>
-          </div>
-        </div>
-      </div>
-    `;
-  }
-
-  // FRIENDS VIEW
-  function renderFriendsView() {
-    return `
-      <div class="flex-1 flex flex-col h-full bg-discord-chat p-6 overflow-y-auto">
-        <h1 class="text-2xl font-bold text-discord-header mb-4">Friends Overview</h1>
-        
-        <!-- FRIEND FILTER TABS -->
-        <div class="flex gap-4 border-b border-[#1f2023] pb-3 mb-6">
-          <button class="text-discord-header font-medium border-b-2 border-discord-brand pb-1">All Friends (${state.friends.length})</button>
-          <button class="text-discord-muted hover:text-discord-header font-medium">Online (${state.friends.filter(f => f.status === 'online').length})</button>
-          <button data-action="add-friend-modal" class="bg-discord-green text-white px-3 py-1 rounded text-xs font-bold hover:bg-green-600 transition">Add Friend</button>
-        </div>
-
-        <!-- FRIEND CARDS GRID -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          ${state.friends.map(f => `
-            <div class="bg-discord-channels p-4 rounded-xl border border-[#1f2023] flex items-center justify-between hover:border-discord-brand/50 transition">
-              <div class="flex items-center gap-3">
-                <div class="relative">
-                  <div class="w-12 h-12 rounded-full bg-purple-900 flex items-center justify-center text-xl">
-                    ${f.avatar}
-                  </div>
-                  <div class="absolute bottom-0 right-0 w-3.5 h-3.5 rounded-full border-2 border-discord-channels ${f.status === 'online' ? 'bg-discord-green' : f.status === 'idle' ? 'bg-discord-yellow' : f.status === 'dnd' ? 'bg-discord-red' : 'bg-gray-500'}"></div>
-                </div>
-                <div>
-                  <div class="font-bold text-discord-header text-sm">${esc(f.name)} <span class="text-discord-muted text-xs">#${f.tag}</span></div>
-                  <div class="text-xs text-discord-muted">${esc(f.customStatus || 'No custom status')}</div>
-                </div>
-              </div>
-              <button data-action="open-dm" data-id="${f.id}" class="bg-discord-chat hover:bg-discord-hover p-2 rounded-full text-discord-header" title="Message">
-                💬
-              </button>
-            </div>
-          `).join('')}
-        </div>
-      </div>
-    `;
-  }
-
-  // FREE DEMO NITRO HUB
-  function renderNitroHubView() {
-    const srv = getCurrentServer();
-    return `
-      <div class="flex-1 overflow-y-auto p-6 bg-gradient-to-b from-[#200c3b] via-discord-chat to-discord-chat space-y-8">
-        <!-- HERO BANNER -->
-        <div class="relative overflow-hidden bg-gradient-to-r from-purple-700 via-pink-600 to-indigo-700 rounded-2xl p-8 text-white shadow-2xl border border-pink-500/30">
-          <span class="bg-white/20 backdrop-blur-md px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">UNOFFICIAL BROWSER SIMULATOR</span>
-          <h1 class="text-4xl font-extrabold mt-3 mb-2 flex items-center gap-2">
-            Free Nitro Perks Hub 💎
-          </h1>
-          <p class="text-purple-100 max-w-xl text-sm leading-relaxed">
-            Experience animated avatar decor, profile aura effects, HD screen sharing simulations, custom soundboard triggers, and full server boosting progression without actual payment!
-          </p>
-          <div class="mt-6 flex flex-wrap gap-3">
-            <button data-action="nav-shop" class="bg-white text-purple-900 font-bold px-5 py-2.5 rounded-xl shadow hover:bg-purple-100 transition">
-              Open Profile Shop
-            </button>
-            <button data-action="boost-server" class="bg-purple-900/60 backdrop-blur-md text-white font-bold px-5 py-2.5 rounded-xl border border-purple-400/40 hover:bg-purple-900 transition">
-              🚀 Boost Server (${srv.boosts} Boosts)
-            </button>
-          </div>
-        </div>
-
-        <!-- SERVER BOOSTING PROGRESS -->
-        <div class="bg-discord-channels p-6 rounded-2xl border border-[#1f2023] space-y-4">
-          <div class="flex justify-between items-center">
-            <div>
-              <h2 class="text-lg font-bold text-discord-header">Server Boosting Progress (${srv.name})</h2>
-              <p class="text-xs text-discord-muted">Level 3 unlocked: 1080p 60fps streaming, 100 soundboard slots & vanity URL</p>
-            </div>
-            <span class="bg-discord-nitro/20 text-discord-nitro px-3 py-1 rounded-full font-bold text-xs">Level ${srv.boostLevel} Active</span>
-          </div>
-
-          <div class="w-full bg-discord-chat h-4 rounded-full overflow-hidden p-0.5 border border-[#1f2023]">
-            <div class="bg-gradient-to-r from-purple-500 to-pink-500 h-full rounded-full transition-all duration-500" style="width: ${Math.min((srv.boosts / 14) * 100, 100)}%"></div>
-          </div>
-        </div>
-
-        <!-- SYNTHESIZED SOUNDBOARD -->
-        <div class="bg-discord-channels p-6 rounded-2xl border border-[#1f2023] space-y-4">
-          <h2 class="text-lg font-bold text-discord-header flex items-center gap-2">
-            <span>🔊 Synthesized Web Audio Soundboard</span>
-            <span class="text-xs font-normal text-discord-muted">(Click to play sound effects)</span>
-          </h2>
-          <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
-            ${state.soundboard.map(sb => `
-              <button data-action="play-sound" data-sound="${sb.sound}" class="bg-discord-chat hover:bg-discord-hover p-4 rounded-xl border border-[#1f2023] flex items-center gap-3 transition group text-left">
-                <span class="text-3xl group-hover:scale-110 transition">${sb.emoji}</span>
-                <div>
-                  <div class="font-bold text-discord-header text-sm">${sb.name}</div>
-                  <div class="text-[11px] text-discord-muted">Nitro Sound</div>
-                </div>
-              </button>
-            `).join('')}
-          </div>
-        </div>
-      </div>
-    `;
-  }
-
-  // PROFILE COSMETICS SHOP
-  function renderShopView() {
-    const decors = [
-      { id: "none", name: "None", icon: "❌" },
-      { id: "cyberpunk", name: "Cyberpunk Ring", icon: "⚡" },
-      { id: "sparkle", name: "Sparkle Aura", icon: "✨" },
-      { id: "flame", name: "Flame Border", icon: "🔥" },
-      { id: "cat", name: "Neon Cat Ears", icon: "🐱" },
-      { id: "sakura", name: "Sakura Blossoms", icon: "🌸" }
-    ];
-
-    const effects = [
-      { id: "none", name: "None", icon: "❌" },
-      { id: "sakura", name: "Sakura Petals", icon: "🌸" },
-      { id: "glitch", name: "Cyber Glitch", icon: "👾" },
-      { id: "stars", name: "Star Burst", icon: "⭐" }
-    ];
-
-    return `
-      <div class="flex-1 overflow-y-auto p-6 bg-discord-chat space-y-8">
-        <div>
-          <h1 class="text-2xl font-bold text-discord-header">Profile Cosmetics Shop 🛍️</h1>
-          <p class="text-xs text-discord-muted">Equip animated avatar rings and profile background effects instantly.</p>
-        </div>
-
-        <!-- LIVE PREVIEW CARD -->
-        <div class="bg-discord-channels rounded-2xl overflow-hidden border border-[#1f2023] max-w-md shadow-xl relative">
-          <div class="h-28 w-full relative" style="background: ${state.user.bannerColor}">
-            ${state.user.effect !== 'none' ? `<div class="absolute inset-0 profile-effect-${state.user.effect}"></div>` : ''}
-          </div>
-          <div class="px-6 pb-6 relative">
-            <div class="w-20 h-20 rounded-full bg-purple-900 border-4 border-discord-channels flex items-center justify-center text-3xl -mt-10 relative ${state.user.decor !== 'none' ? 'decor-ring-' + state.user.decor : ''}">
-              ${state.user.avatar}
-            </div>
-            <h2 class="text-lg font-bold text-discord-header mt-2">${esc(state.user.username)}</h2>
-            <div class="text-xs text-discord-muted">#${state.user.discriminator}</div>
-            <p class="text-xs text-discord-text mt-3 bg-discord-chat p-3 rounded-lg border border-[#1f2023]">${esc(state.user.bio)}</p>
-          </div>
-        </div>
-
-        <!-- AVATAR DECORATIONS -->
-        <div class="space-y-3">
-          <h3 class="text-sm font-bold text-discord-header uppercase tracking-wider">Avatar Decorations</h3>
-          <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
-            ${decors.map(d => `
-              <button data-action="set-decor" data-decor="${d.id}" class="p-3 rounded-xl bg-discord-channels border ${state.user.decor === d.id ? 'border-discord-brand bg-discord-brand/10' : 'border-[#1f2023] hover:bg-discord-hover'} flex items-center gap-3 transition">
-                <span class="text-2xl">${d.icon}</span>
-                <span class="font-medium text-discord-header text-sm">${d.name}</span>
-              </button>
-            `).join('')}
-          </div>
-        </div>
-
-        <!-- PROFILE BACKGROUND EFFECTS -->
-        <div class="space-y-3">
-          <h3 class="text-sm font-bold text-discord-header uppercase tracking-wider">Profile Background Effects</h3>
-          <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
-            ${effects.map(e => `
-              <button data-action="set-effect" data-effect="${e.id}" class="p-3 rounded-xl bg-discord-channels border ${state.user.effect === e.id ? 'border-discord-brand bg-discord-brand/10' : 'border-[#1f2023] hover:bg-discord-hover'} flex items-center gap-3 transition">
-                <span class="text-2xl">${e.icon}</span>
-                <span class="font-medium text-discord-header text-sm">${e.name}</span>
-              </button>
-            `).join('')}
-          </div>
-        </div>
-      </div>
-    `;
-  }
-
-  // SETTINGS & LOGIN VIEW
-  function renderSettingsView() {
-    return `
-      <div class="flex-1 overflow-y-auto p-6 bg-discord-chat space-y-8 max-w-2xl">
-        <div>
-          <h1 class="text-2xl font-bold text-discord-header">User Settings ⚙️</h1>
-          <p class="text-xs text-discord-muted">Customize your client experience, appearance, and profile details.</p>
-        </div>
-
-        <!-- PROFILE EDIT FORM -->
-        <div class="bg-discord-channels p-6 rounded-2xl border border-[#1f2023] space-y-4">
-          <h2 class="text-base font-bold text-discord-header">Edit Profile</h2>
-          
-          <div class="space-y-1">
-            <label class="text-xs font-bold text-discord-muted uppercase">Display Name</label>
-            <input id="setting-username" type="text" value="${esc(state.user.username)}" class="w-full bg-discord-chat border border-[#1f2023] p-2.5 rounded-lg text-discord-header focus:outline-none focus:border-discord-brand">
-          </div>
-
-          <div class="space-y-1">
-            <label class="text-xs font-bold text-discord-muted uppercase">Avatar Emoji</label>
-            <input id="setting-avatar" type="text" value="${esc(state.user.avatar)}" class="w-full bg-discord-chat border border-[#1f2023] p-2.5 rounded-lg text-discord-header focus:outline-none focus:border-discord-brand">
-          </div>
-
-          <div class="space-y-1">
-            <label class="text-xs font-bold text-discord-muted uppercase">About Me (Bio)</label>
-            <textarea id="setting-bio" rows="3" class="w-full bg-discord-chat border border-[#1f2023] p-2.5 rounded-lg text-discord-header focus:outline-none focus:border-discord-brand">${esc(state.user.bio)}</textarea>
-          </div>
-
-          <button data-action="save-profile" class="bg-discord-brand hover:bg-discord-brandHover text-white px-4 py-2 rounded-lg font-medium text-sm transition">
-            Save Profile Changes
-          </button>
-        </div>
-
-        <!-- APP APPEARANCE / THEMES -->
-        <div class="bg-discord-channels p-6 rounded-2xl border border-[#1f2023] space-y-4">
-          <h2 class="text-base font-bold text-discord-header">Appearance Theme</h2>
-          <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
-            ${[
-              { id: 'dark', name: 'Dark Default', color: '#313338' },
-              { id: 'midnight', name: 'Midnight Blue', color: '#171827' },
-              { id: 'amoled', name: 'AMOLED Pure Black', color: '#000000' },
-              { id: 'neon', name: 'Nitro Neon Gradient', color: '#261247' },
-              { id: 'light', name: 'Light Mode', color: '#ffffff' }
-            ].map(t => `
-              <button data-action="set-theme" data-theme="${t.id}" class="p-3 rounded-xl border ${state.user.theme === t.id ? 'border-discord-brand ring-2 ring-discord-brand/50' : 'border-[#1f2023]'} flex items-center gap-3 transition text-left" style="background: ${t.color}">
-                <span class="font-bold text-xs ${t.id === 'light' ? 'text-black' : 'text-white'}">${t.name}</span>
-              </button>
-            `).join('')}
-          </div>
-        </div>
-
-        <!-- DATA CONTROL -->
-        <div class="bg-discord-channels p-6 rounded-2xl border border-red-500/30 space-y-3">
-          <h2 class="text-base font-bold text-red-400">Reset & Account Demo</h2>
-          <p class="text-xs text-discord-muted">Clear all stored local messages, customized friends, and return to default state.</p>
-          <button data-action="reset-data" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-medium text-sm transition">
-            Reset All Local Data
-          </button>
-        </div>
-      </div>
-    `;
-  }
-
-  // MEMBER LIST (RIGHT PANEL)
-  function renderMemberList() {
-    return `
-      <aside class="w-60 bg-discord-channels border-l border-[#1f2023] hidden lg:flex flex-col h-full p-4 overflow-y-auto space-y-4 flex-shrink-0">
-        <div>
-          <h3 class="text-xs font-bold text-discord-muted uppercase tracking-wider mb-2">Online — 4</h3>
-          <div class="space-y-2">
-            <div class="flex items-center gap-2 py-1 px-1 rounded hover:bg-discord-hover transition cursor-pointer">
-              <div class="relative">
-                <div class="w-8 h-8 rounded-full bg-purple-900 flex items-center justify-center text-sm ${state.user.decor ? 'decor-ring-' + state.user.decor : ''}">
-                  ${state.user.avatar}
-                </div>
-                <div class="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-discord-green border-2 border-discord-channels"></div>
-              </div>
-              <div>
-                <div class="font-semibold text-discord-header text-xs flex items-center gap-1">
-                  ${esc(state.user.username)}
-                  <span class="text-[10px] text-discord-nitro">💎</span>
-                </div>
-                <div class="text-[10px] text-discord-muted truncate">Playing Discord Web</div>
-              </div>
-            </div>
-
-            ${state.friends.filter(f => f.status === 'online').map(f => `
-              <div class="flex items-center gap-2 py-1 px-1 rounded hover:bg-discord-hover transition cursor-pointer">
-                <div class="relative">
-                  <div class="w-8 h-8 rounded-full bg-purple-900 flex items-center justify-center text-sm">
-                    ${f.avatar}
-                  </div>
-                  <div class="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-discord-green border-2 border-discord-channels"></div>
-                </div>
-                <div>
-                  <div class="font-semibold text-discord-header text-xs">${esc(f.name)}</div>
-                  <div class="text-[10px] text-discord-muted truncate">${esc(f.customStatus || 'Online')}</div>
-                </div>
-              </div>
-            `).join('')}
-          </div>
-        </div>
-      </aside>
-    `;
-  }
-
-  // --- EVENT BINDING ENGINE ---
-  function bindEvents() {
-    // Action clicks
-    document.querySelectorAll("[data-action]").forEach(el => {
-      el.onclick = (e) => handleAction(el.dataset.action, el, e);
-    });
-
-    // Chat enter keyboard shortcut
-    const chatInput = document.getElementById("chat-input");
-    if (chatInput) {
-      chatInput.onkeydown = (e) => {
-        if (e.key === "Enter" && !e.shiftKey) {
-          e.preventDefault();
-          sendMessage();
-        }
-      };
-    }
-  }
-
-  function handleAction(action, el, e) {
-    switch (action) {
-      case 'select-server':
-        state.currentServer = parseInt(el.dataset.idx);
-        state.currentChannel = 0;
-        state.activeView = 'chat';
-        saveState();
-        render();
-        break;
-
-      case 'select-channel':
-        state.currentChannel = parseInt(el.dataset.idx);
-        state.activeView = 'chat';
-        saveState();
-        render();
-        scrollToBottom();
-        break;
-
-      case 'nav-dm':
-      case 'nav-friends':
-        state.activeView = 'friends';
-        saveState();
-        render();
-        break;
-
-      case 'nav-nitro':
-        state.activeView = 'nitro';
-        saveState();
-        render();
-        break;
-
-      case 'nav-shop':
-        state.activeView = 'shop';
-        saveState();
-        render();
-        break;
-
-      case 'nav-settings':
-        state.activeView = 'settings';
-        saveState();
-        render();
-        break;
-
-      case 'send-msg':
-        sendMessage();
-        break;
-
-      case 'toggle-mute':
-        state.user.muted = !state.user.muted;
-        showToast(state.user.muted ? "Microphone Muted" : "Microphone Unmuted", "🎙️");
-        saveState();
-        render();
-        break;
-
-      case 'toggle-deafen':
-        state.user.deafened = !state.user.deafened;
-        showToast(state.user.deafened ? "Deafened Audio" : "Undeafened Audio", "🎧");
-        saveState();
-        render();
-        break;
-
-      case 'play-sound':
-        playSound(el.dataset.sound);
-        showToast(`Playing ${el.dataset.sound} soundboard effect!`, "🔊");
-        break;
-
-      case 'set-decor':
-        state.user.decor = el.dataset.decor;
-        saveState();
-        render();
-        showToast("Equipped Avatar Decoration!", "✨");
-        break;
-
-      case 'set-effect':
-        state.user.effect = el.dataset.effect;
-        saveState();
-        render();
-        showToast("Equipped Profile Background Effect!", "🌸");
-        break;
-
-      case 'set-theme':
-        state.user.theme = el.dataset.theme;
-        saveState();
-        render();
-        showToast(`Theme updated to ${el.dataset.theme.toUpperCase()}`, "🎨");
-        break;
-
-      case 'save-profile':
-        const nameVal = document.getElementById("setting-username").value.trim();
-        const avaVal = document.getElementById("setting-avatar").value.trim();
-        const bioVal = document.getElementById("setting-bio").value.trim();
-        if (nameVal) state.user.username = nameVal;
-        if (avaVal) state.user.avatar = avaVal;
-        state.user.bio = bioVal;
-        saveState();
-        render();
-        showToast("Profile details updated!", "✅");
-        break;
-
-      case 'boost-server':
-        const srv = getCurrentServer();
-        srv.boosts++;
-        if (srv.boosts >= 14) srv.boostLevel = 3;
-        else if (srv.boosts >= 7) srv.boostLevel = 2;
-        saveState();
-        playSound("victory");
-        render();
-        showToast(`Server boosted! Total Boosts: ${srv.boosts}`, "🚀");
-        break;
-
-      case 'toggle-members':
-        state.memberListOpen = !state.memberListOpen;
-        render();
-        break;
-
-      case 'join-voice':
-        state.inVoiceCall = true;
-        state.currentVoiceChannel = el.dataset.name;
-        playSound("message");
-        render();
-        showToast(`Connected to ${el.dataset.name}`, "🔊");
-        break;
-
-      case 'disconnect-voice':
-        state.inVoiceCall = false;
-        state.currentVoiceChannel = null;
-        render();
-        showToast("Disconnected from Voice Room", "✖");
-        break;
-
-      case 'reset-data':
-        if (confirm("Reset all custom messages and settings to default?")) {
-          localStorage.removeItem(STORAGE_KEY);
-          state = structuredClone(defaultState);
-          render();
-          showToast("Data restored to factory defaults", "🔄");
-        }
-        break;
-    }
-  }
-
-  function sendMessage() {
-    const input = document.getElementById("chat-input");
-    if (!input) return;
-    const val = input.value.trim();
-    if (!val) return;
-
-    const msgs = getMessages();
-    const newMsg = {
-      id: "m_" + Date.now(),
-      user: state.user.username,
-      avatar: state.user.avatar,
-      bot: false,
-      text: val,
-      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      reactions: []
-    };
-
-    msgs.push(newMsg);
-    input.value = "";
-    saveState();
-    playSound("message");
-    render();
-    scrollToBottom();
-
-    // Trigger AI / Demo Bot replies
-    triggerBotResponse(val);
-  }
-
-  // --- INITIALIZE APP ---
-  render();
+"use strict";
+const $ = id => document.getElementById(id);
+const KEY = "freeNitroHubDemo_v1";
+const defaults = {
+ user:{name:"GuestPlayer",avatar:"😎",status:"online",bio:"Welcome to my profile!",theme:"purple",decor:true,badges:true},
+ page:"chat",server:0,channel:0,dm:null,
+ servers:[
+  {name:"Free Nitro Hub",icon:"💜",channels:[
+   {name:"welcome",topic:"Say hello and meet the community"},
+   {name:"general",topic:"Chat about anything"},
+   {name:"memes",topic:"Share your favorite memes"},
+   {name:"nitro-showcase",topic:"Show off your cosmetic demo perks"}
+  ]},
+  {name:"Gaming Lounge",icon:"🎮",channels:[
+   {name:"general",topic:"Gaming conversations"},
+   {name:"looking-for-group",topic:"Find people to play with"}
+  ]},
+  {name:"Creative Corner",icon:"🎨",channels:[
+   {name:"art",topic:"Share your creations"},
+   {name:"ideas",topic:"Suggest new ideas"}
+  ]}
+ ],
+ messages:{},
+ friends:[
+  {name:"Luna",avatar:"🌙",status:"online"},
+  {name:"PixelFox",avatar:"🦊",status:"idle"},
+  {name:"Nova",avatar:"⭐",status:"online"},
+  {name:"Cloudy",avatar:"☁️",status:"dnd"}
+ ],
+ reactions:{},decorations:true
+};
+let data;
+try {
+ const saved=JSON.parse(localStorage.getItem(KEY)||"null");
+ data=saved && saved.user && saved.servers ? {...defaults,...saved,user:{...defaults.user,...saved.user}} : structuredClone(defaults);
+} catch(e){data=JSON.parse(JSON.stringify(defaults))}
+let emojiOpen=false, loginMode="login", toastTimer, messageSearch="";
+const emojis=["😀","😂","🥹","😍","😎","😭","🔥","❤️","💜","👍","👎","🎉","✨","💀","👀","🤔","🚀","⭐","🌙","☁️","🎮","💎","👑","🥳","🤣","🙌","💯","🫡","🍀","🌈","🦊","🐱"];
+function save(){try{localStorage.setItem(KEY,JSON.stringify(data))}catch(e){notify("Storage is full; some changes may not save.")}}
+function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+function notify(s){const t=$("toast");t.textContent=s;t.hidden=false;clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.hidden=true,2400)}
+function currentServer(){return data.servers[data.server]||data.servers[0]}
+function currentChannel(){return currentServer().channels[data.channel]||currentServer().channels[0]}
+function key(){return data.server+"_"+data.channel}
+function msgs(){if(!data.messages[key()])data.messages[key()]=[];return data.messages[key()]}
+function activePage(p){data.page=p;emojiOpen=false;render();save()}
+function ava(emoji,status="online",cls=""){return `<div class="avatar ${esc(status)} ${cls}">${esc(emoji||"🙂")}</div>`}
+function btn(label,action,cls="btn",title=""){return `<button class="${cls}" data-action="${action}" title="${esc(title||label)}">${label}</button>`}
+function pageTitle(){return ({chat:currentChannel().name,home:"Home",friends:"Friends",nitro:"Free Demo Nitro",profile:"My Profile",settings:"User Settings",login:"Demo Account"})[data.page]||"Free Nitro Hub"}
+function render(){
+ document.body.className="theme-"+(data.user.theme==="light"?"light":data.user.theme==="midnight"?"midnight":"");
+ const app=$("app");
+ app.innerHTML=`
+ <aside class="servers">
+  <button class="server ${data.page==="home"?"active":""}" data-action="home" title="Home">⌂</button>
+  <div style="height:1px;background:var(--line);width:30px;margin:2px 0"></div>
+  ${data.servers.map((s,i)=>`<button class="server ${data.page==="chat"&&data.server===i?"active":""}" data-action="server" data-i="${i}" title="${esc(s.name)}">${esc(s.icon)}</button>`).join("")}
+  <button class="server add" data-action="addserver" title="Create demo server">+</button>
+ </aside>
+ <aside class="left">
+  <div class="brand"><span class="brandname"><span class="brandmark">✦</span>Free Nitro Hub</span><button class="iconbtn" data-action="addserver" title="Create server">＋</button></div>
+  <div class="serverhead">${esc(currentServer().name)} <button class="iconbtn" data-action="addchannel" style="float:right;padding:0 5px">＋</button></div>
+  <div class="channels">
+   <button class="channel ${data.page==="home"?"active":""}" data-action="home"><span>⌂</span> Home</button>
+   <button class="channel ${data.page==="friends"?"active":""}" data-action="friends"><span>♧</span> Friends</button>
+   <div class="serverhead">TEXT CHANNELS</div>
+   ${currentServer().channels.map((c,i)=>`<button class="channel ${data.page==="chat"&&data.channel===i?"active":""}" data-action="channel" data-i="${i}"><span class="hash">#</span><span>${esc(c.name)}</span>${c.name==="welcome"?'<span class="count">NEW</span>':""}</button>`).join("")}
+   <div class="serverhead">PERSONAL</div>
+   <button class="channel ${data.page==="nitro"?"active":""}" data-action="nitro"><span>💎</span> Free Demo Nitro</button>
+   <button class="channel ${data.page==="profile"?"active":""}" data-action="profile"><span>👤</span> My Profile</button>
+   <button class="channel ${data.page==="settings"?"active":""}" data-action="settings"><span>⚙</span> Settings</button>
+  </div>
+  <div class="userbar">${ava(data.user.avatar,data.user.status)}<div class="userinfo"><strong>${esc(data.user.name)}</strong><small>${esc(data.user.status)} · Demo</small></div><button class="iconbtn" data-action="settings" title="Settings">⚙</button></div>
+ </aside>
+ <main class="main">
+  <header class="topbar">
+   <div class="top-title"><span>${data.page==="chat"?"#":data.page==="nitro"?"💎":"✦"}</span><span>${esc(pageTitle())}<small style="display:block;font-size:10px">${data.page==="chat"?esc(currentChannel().topic):"Free, local browser demo"}</small></span></div>
+   <div class="top-actions">
+    <button class="iconbtn desktop-only" data-action="friends" title="Friends">♧</button>
+    <button class="iconbtn" data-action="search" title="Search messages">⌕</button>
+    <button class="iconbtn" data-action="profile" title="Profile">👤</button>
+   </div>
+  </header>
+  ${data.page==="chat"?chatPage():data.page==="home"?homePage():data.page==="friends"?friendsPage():data.page==="nitro"?nitroPage():data.page==="profile"?profilePage():data.page==="settings"?settingsPage():loginPage()}
+ </main>
+ <nav class="mobilebar">
+  <button data-action="home" class="${data.page==="home"?"active":""}"><span>⌂</span>Home</button>
+  <button data-action="chat" class="${data.page==="chat"?"active":""}"><span>#</span>Chat</button>
+  <button data-action="friends" class="${data.page==="friends"?"active":""}"><span>♧</span>Friends</button>
+  <button data-action="nitro" class="${data.page==="nitro"?"active":""}"><span>💎</span>Nitro</button>
+  <button data-action="settings" class="${data.page==="settings"?"active":""}"><span>⚙</span>Settings</button>
+ </nav>`;
+ bind();
+}
+function chatPage(){
+ const list=msgs().filter(m=>!messageSearch||m.text.toLowerCase().includes(messageSearch.toLowerCase()));
+ return `<div class="chatlayout"><section class="chat">
+ <div class="welcome"><div class="welcome-icon">#</div><h2>Welcome to #${esc(currentChannel().name)}!</h2><p>${esc(currentChannel().topic)}. This is the beginning of this channel.</p></div>
+ <div class="messages" id="messages">${list.length?`<div class="day">MESSAGES · LOCAL DEMO</div>${list.map((m,i)=>messageHTML(m,i)).join("")}`:`<div class="empty">💬<br><strong>No messages${messageSearch?" match your search": " yet"}</strong><p>Be the first to say hello!</p></div>`}</div>
+ <div class="composerwrap"><div class="composer">
+ <button data-action="emoji" title="Emoji picker">＋</button>
+ ${emojiOpen?`<div class="emoji-pop">${emojis.map(e=>`<button data-action="insertEmoji" data-emoji="${e}">${e}</button>`).join("")}</div>`:""}
+ <textarea id="messageInput" rows="1" maxlength="1500" placeholder="Message #${esc(currentChannel().name)}" aria-label="Message">${""}</textarea>
+ <button data-action="insertQuick" data-emoji="🎁" title="Add a gift emoji">🎁</button>
+ <button class="send" data-action="send">Send</button>
+ </div><div class="hint">Enter to send · Shift + Enter for a new line · Messages stay in this browser</div></div>
+ </section><aside class="members"><div class="membertitle">Members — ${data.friends.length+1}</div>
+ <div class="member" data-action="profile">${ava(data.user.avatar,data.user.status)}<div class="membername">${esc(data.user.name)} <small style="color:var(--muted)"> (you)</small></div></div>
+ <div class="membertitle">ONLINE — ${data.friends.filter(f=>f.status==="online").length}</div>
+ ${data.friends.map((f,i)=>`<div class="member" data-action="friend" data-i="${i}">${ava(f.avatar,f.status)}<div class="membername">${esc(f.name)}</div></div>`).join("")}
+ </aside></div>`;
+}
+function messageHTML(m,i){
+ const reactions=(m.reactions||[]).map((r,j)=>`<button class="react ${r.mine?"selected":""}" data-action="react" data-mi="${i}" data-ri="${j}">${esc(r.emoji)} ${r.count}</button>`).join("");
+ return `<article class="message">${ava(m.avatar,m.status,"msgavatar")}<div class="msgbody"><div class="msghead"><strong>${esc(m.name)}</strong>${m.demo?'<span class="badge">DEMO BOT</span>':""}<span class="time">${esc(m.time)}</span></div><div class="msgtext">${esc(m.text)}</div>${reactions?`<div class="reactions">${reactions}</div>`:""}<div class="msgtools"><button data-action="addreact" data-mi="${i}">☺ React</button>${m.mine?`<button data-action="delete" data-mi="${i}">Delete</button>`:""}</div></div></article>`;
+}
+function homePage(){return `<div class="view"><div class="hero"><span class="tag">UNOFFICIAL BROWSER DEMO</span><div class="sparkle">✦ 💜</div><h1>Welcome to Free Nitro Hub</h1><p>A community-style chat playground with customizable profiles and cosmetic demo perks.</p><br>${btn("Open chat","chat")} ${btn("Explore Demo Nitro","nitro","btn secondary")}</div><h2>Your servers</h2><div class="grid">${data.servers.map((s,i)=>`<div class="card"><div style="font-size:32px">${esc(s.icon)}</div><h3>${esc(s.name)}</h3><p class="muted">${s.channels.length} channels · Local demo</p>${btn("Open server","server","btn small")}<input type="hidden" value="${i}"></div>`).join("")}</div><h2>Quick actions</h2><div class="grid"><div class="card"><h3>👤 Customize your profile</h3><p class="muted">Choose an avatar, status and bio.</p>${btn("Edit profile","profile","btn secondary")}</div><div class="card"><h3>💎 Demo Nitro</h3><p class="muted">Try cosmetic themes and badges.</p>${btn("Explore perks","nitro","btn secondary")}</div><div class="card"><h3>♧ Friends</h3><p class="muted">View your sample friends.</p>${btn("View friends","friends","btn secondary")}</div></div><p class="muted">Messages and profile settings are stored locally. Other visitors cannot see your data.</p></div>`}
+function friendsPage(){return `<div class="view"><h1>Friends</h1><p class="muted">Sample friends for your local demo.</p><div class="card"><strong>All friends — ${data.friends.length}</strong></div>${data.friends.map((f,i)=>`<div class="card" style="display:flex;align-items:center;gap:12px">${ava(f.avatar,f.status)}<div style="flex:1"><strong>${esc(f.name)}</strong><div class="muted">${esc(f.status)}</div></div>${btn("Message","friend","btn secondary small")} ${btn("Change status","friendstatus","btn small")}</div>`).join("")}<div class="card"><h3>Add a sample friend</h3><label>Display name</label><input class="input" id="friendName" maxlength="24" placeholder="Enter a demo name">${btn("Add friend","addfriend")}</div></div>`}
+function nitroPage(){return `<div class="view"><div class="hero"><span class="tag">FREE DEMO NITRO</span><h1>💎 Make your profile shine</h1><p>Try local cosmetic effects without payment. No real Nitro is included.</p><br>${btn(data.decorations?"Disable decorations":"Enable decorations","toggleDecor")}</div><h2>Demo perks</h2><div class="grid">
+ <div class="feature"><div class="emoji">✨</div><h3>Profile sparkle</h3><p>A cosmetic profile decoration inside this demo.</p></div>
+ <div class="feature"><div class="emoji">🎨</div><h3>Custom themes</h3><p>Choose purple, midnight or light appearance.</p></div>
+ <div class="feature"><div class="emoji">🏅</div><h3>Demo badges</h3><p>Decorative badges for your local profile only.</p></div>
+ <div class="feature"><div class="emoji">😎</div><h3>Custom avatar</h3><p>Use an emoji as your demo avatar.</p></div>
+ <div class="feature"><div class="emoji">💬</div><h3>Local chat</h3><p>Send messages and add reactions in your browser.</p></div>
+ <div class="feature"><div class="emoji">💜</div><h3>No payment</h3><p>No checkout, payment details or real subscription.</p></div></div>
+ <div class="card"><h2>Important</h2><p class="muted">These perks are visual features created for Free Nitro Hub. They do not unlock Discord features, change a Discord account, or grant an actual Nitro subscription.</p>${btn("Customize my profile","profile")}</div></div>`}
+function profilePage(){return `<div class="view"><h1>My Profile</h1><p class="muted">Customize your local demo identity.</p><div class="card" style="padding:0;overflow:hidden;max-width:620px"><div class="profilehero"></div><div class="profiletop">${ava(data.user.avatar,data.user.status,"bigavatar")}<h2 style="margin:6px 0 0">${esc(data.user.name)} ${data.decorations&&data.user.decor?"✨":""}</h2><div class="muted">${esc(data.user.status)} · Free Nitro Hub</div>${data.user.badges?'<div class="badges"><span class="badge">✦ DEMO MEMBER</span><span class="badge">💎 COSMETIC PERKS</span></div>':""}<p>${esc(data.user.bio)}</p></div></div>
+ <div class="card" style="max-width:620px"><h2>Edit profile</h2><label>Display name</label><input id="profileName" class="input" maxlength="24" value="${esc(data.user.name)}"><label>Avatar emoji</label><input id="profileAvatar" class="input" maxlength="8" value="${esc(data.user.avatar)}"><label>About me</label><textarea id="profileBio" class="input" maxlength="180" rows="3">${esc(data.user.bio)}</textarea><label>Status</label><select id="profileStatus" class="input"><option value="online" ${data.user.status==="online"?"selected":""}>🟢 Online</option><option value="idle" ${data.user.status==="idle"?"selected":""}>🌙 Idle</option><option value="dnd" ${data.user.status==="dnd"?"selected":""}>⛔ Do not disturb</option><option value="offline" ${data.user.status==="offline"?"selected":""}>⚫ Invisible</option></select><label><input id="profileBadges" type="checkbox" ${data.user.badges?"checked":""}> Show demo badges</label><br><br>${btn("Save profile","saveprofile")} ${btn("Reset profile","resetprofile","btn secondary")}</div></div>`}
+function settingsPage(){return `<div class="view"><h1>User Settings</h1><p class="muted">Settings apply only to this browser demo.</p><div class="card"><h2>Appearance</h2><label>Theme</label><select id="themeSelect" class="input"><option value="purple" ${data.user.theme==="purple"?"selected":""}>Purple Dark</option><option value="midnight" ${data.user.theme==="midnight"?"selected":""}>Midnight</option><option value="light" ${data.user.theme==="light"?"selected":""}>Light</option></select>${btn("Apply theme","savetheme")}<hr style="border-color:var(--line);margin:20px 0"><label><input id="decorSetting" type="checkbox" ${data.user.decor?"checked":""}> Enable profile sparkle decoration</label><br><br><label><input id="badgeSetting" type="checkbox" ${data.user.badges?"checked":""}> Show cosmetic demo badges</label></div><div class="card"><h2>Demo data</h2><p class="muted">Clear messages, custom profiles and local changes to restore the original sample data.</p>${btn("Export demo data","export","btn secondary")} ${btn("Reset all demo data","resetall","btn danger")}</div><div class="card"><h2>Account safety</h2><p class="muted">This demo does not use Discord login, collect passwords, or authenticate with Discord. Do not enter real account credentials.</p>${btn("Demo login / signup","login","btn secondary")}</div></div>`}
+function loginPage(){return `<div class="view"><div class="card" style="max-width:460px;margin:25px auto"><div style="text-align:center;font-size:40px">✦</div><h1 style="text-align:center">${loginMode==="login"?"Welcome back":"Create a demo profile"}</h1><p class="muted" style="text-align:center">Local demo account only. No password required.</p><label>Display name</label><input id="loginName" class="input" maxlength="24" value="${esc(data.user.name)}" placeholder="Choose a display name"><label>Avatar emoji</label><input id="loginAvatar" class="input" maxlength="8" value="${esc(data.user.avatar)}" placeholder="😎"><p class="muted">Your demo profile is saved only in this browser. This is not Discord authentication.</p>${btn(loginMode==="login"?"Continue as demo user":"Create demo profile","demologin")} <button class="btn secondary" data-action="switchlogin">${loginMode==="login"?"Switch to signup":"Back to login"}</button></div></div>`}
+function bind(){
+ document.querySelectorAll("[data-action]").forEach(el=>el.addEventListener("click",()=>act(el.dataset.action,el)));
+ const input=$("messageInput");
+ if(input){input.addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();sendMessage()}});input.addEventListener("input",()=>{input.style.height="auto";input.style.height=Math.min(input.scrollHeight,120)+"px"})}
+}
+function act(a,el){
+ const i=Number(el.dataset.i);
+ switch(a){
+ case "home":activePage("home");break;
+ case "chat":activePage("chat");break;
+ case "server":data.server=i===undefined?0:i;data.channel=0;data.page="chat";messageSearch="";save();render();break;
+ case "channel":data.channel=i;data.page="chat";messageSearch="";save();render();break;
+ case "friends":activePage("friends");break;
+ case "nitro":activePage("nitro");break;
+ case "profile":activePage("profile");break;
+ case "settings":activePage("settings");break;
+ case "login":loginMode="login";activePage("login");break;
+ case "switchlogin":loginMode=loginMode==="login"?"signup":"login";render();break;
+ case "demologin":{const n=$("loginName").value.trim();if(!n)return notify("Enter a display name.");data.user.name=n.slice(0,24);data.user.avatar=$("loginAvatar").value.trim()||"😎";save();activePage("home");notify("Demo profile ready!");break}
+ case "addserver":{const n=prompt("Name your demo server:");if(!n||!n.trim())return;data.servers.push({name:n.trim().slice(0,35),icon:"🌟",channels:[{name:"general",topic:"Welcome to your new demo channel"},{name:"random",topic:"Chat about anything"}]});data.server=data.servers.length-1;data.channel=0;data.page="chat";save();render();notify("Demo server created.");break}
+ case "addchannel":{const n=prompt("New channel name (no spaces):");if(!n||!n.trim())return;currentServer().channels.push({name:n.trim().toLowerCase().replace(/\s+/g,"-").slice(0,32),topic:"A new local demo channel"});data.channel=currentServer().channels.length-1;data.page="chat";save();render();break}
+ case "send":sendMessage();break;
+ case "emoji":emojiOpen=!emojiOpen;render();break;
+ case "insertEmoji":insertText(el.dataset.emoji);break;
+ case "insertQuick":insertText(el.dataset.emoji);break;
+ case "addreact":{const idx=Number(el.dataset.mi);const m=msgs()[idx];if(!m)return;const em=prompt("Enter a reaction emoji (e.g. 💜):","💜");if(!em)return;m.reactions=m.reactions||[];const found=m.reactions.find(r=>r.emoji===em);if(found){found.count++;found.mine=true}else m.reactions.push({emoji:em,count:1,mine:true});save();render();break}
+ case "react":{const m=msgs()[Number(el.dataset.mi)];if(!m)return;const r=m.reactions[Number(el.dataset.ri)];if(!r)return;if(r.mine){r.count--;r.mine=false}else{r.count++;r.mine=true}m.reactions=m.reactions.filter(x=>x.count>0);save();render();break}
+ case "delete":{const idx=Number(el.dataset.mi);const m=msgs()[idx];if(m&&m.mine){msgs().splice(idx,1);save();render();notify("Message deleted.")}break}
+ case "search":{const q=prompt("Search messages in this channel. Leave blank to show all: ",messageSearch);if(q===null)return;messageSearch=q.trim();render();break}
+ case "toggleDecor":data.decorations=!data.decorations;save();render();notify("Cosmetic effect updated.");break;
+ case "saveprofile":{const n=$("profileName").value.trim();if(!n)return notify("Display name cannot be empty.");data.user.name=n.slice(0,24);data.user.avatar=$("profileAvatar").value.trim()||"🙂";data.user.bio=$("profileBio").value.trim().slice(0,180);data.user.status=$("profileStatus").value;data.user.badges=$("profileBadges").checked;save();render();notify("Profile saved locally.");break}
+ case "resetprofile":if(confirm("Reset your profile to the default demo profile?")){data.user={...defaults.user};save();render();notify("Profile reset.")}break;
+ case "savetheme":data.user.theme=$("themeSelect").value;data.user.decor=$("decorSetting").checked;data.user.badges=$("badgeSetting").checked;save();render();notify("Settings saved.");break;
+ case "friend":{const f=data.friends[i];if(!f)return;data.dm=f.name;const n=prompt("Send a local demo message to "+f.name+":");if(n&&n.trim()){notify("This is a local demo; no message was sent to "+f.name+".")}break}
+ case "friendstatus":{const f=data.friends[i];if(!f)return;f.status=({online:"idle",idle:"dnd",dnd:"offline",offline:"online"})[f.status]||"online";save();render();break}
+ case "addfriend":{const n=$("friendName").value.trim();if(!n)return notify("Enter a display name.");if(data.friends.some(f=>f.name.toLowerCase()===n.toLowerCase()))return notify("That sample friend already exists.");data.friends.push({name:n.slice(0,24),avatar:"🙂",status:"online"});save();render();notify("Sample friend added.");break}
+ case "export":{const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});const url=URL.createObjectURL(blob);const link=document.createElement("a");link.href=url;link.download="free-nitro-hub-demo.json";link.click();URL.revokeObjectURL(url);notify("Demo data export started.");break}
+ case "resetall":if(confirm("Reset all local demo data? This cannot be undone.")){localStorage.removeItem(KEY);data=JSON.parse(JSON.stringify(defaults));messageSearch="";save();render();notify("Demo data reset.")}break;
+ }
+}
+function insertText(e){const input=$("messageInput");if(!input)return;input.value+=e;input.focus();emojiOpen=false;const p=input.selectionStart;input.setSelectionRange(p,p);const pop=document.querySelector(".emoji-pop");if(pop)pop.remove()}
+function sendMessage(){
+ const input=$("messageInput");if(!input)return;
+ const text=input.value.trim();if(!text)return;
+ msgs().push({name:data.user.name,avatar:data.user.avatar,status:data.user.status,text:text.slice(0,1500),time:new Date().toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"}),mine:true,reactions:[]});
+ save();emojiOpen=false;messageSearch="";render();
+ const m=$("messages");if(m)m.scrollTop=m.scrollHeight;
+}
+render();
+// Populate sample messages once, so the website looks active immediately.
+if(!Object.values(data.messages).some(a=>Array.isArray(a)&&a.length)){
+ const samples=[
+  ["Welcome to Free Nitro Hub! 💜","Luna","🌙"],
+  ["This is a local demo chat. Try sending a message below!","PixelFox","🦊"],
+  ["Open the Demo Nitro page to explore themes and cosmetic badges ✨","Nova","⭐"]
+ ];
+ data.messages["0_0"]=samples.map(([text,name,avatar],i)=>({text,name,avatar,status:"online",time:["08:41 PM","08:42 PM","08:43 PM"][i],demo:true,reactions:i===0?[{emoji:"💜",count:2,mine:false},{emoji:"👋",count:1,mine:false}]:[]}));
+ save();render();
+}
 })();
 </script>
 </body>
 </html>
-```
